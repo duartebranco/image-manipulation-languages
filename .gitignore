@@ -1,0 +1,12 @@
+*.o
+__pycache__
+.vscode
+.idea
+~*
+.idea
+~*
+*.pyc
+*.class
+*.jar
+
+
