@@ -1,4 +1,4 @@
-// Generated from /home/mega/Documents/comp2425-iml-a4/src/iml.g4 by ANTLR 4.13.1
+// Generated from iml.g4 by ANTLR 4.13.2
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
 
-@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue"})
+@SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast", "CheckReturnValue", "this-escape"})
 public class imlParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.13.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -128,6 +128,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_program; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterProgram(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitProgram(this);
+		}
 	}
 
 	public final ProgramContext program() throws RecognitionException {
@@ -200,6 +208,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitStatement(this);
+		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -305,6 +321,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_variableDeclaration; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterVariableDeclaration(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitVariableDeclaration(this);
+		}
 	}
 
 	public final VariableDeclarationContext variableDeclaration() throws RecognitionException {
@@ -344,6 +368,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assignment; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterAssignment(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitAssignment(this);
+		}
 	}
 
 	public final AssignmentContext assignment() throws RecognitionException {
@@ -386,6 +418,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_ifStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterIfStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitIfStatement(this);
+		}
 	}
 
 	public final IfStatementContext ifStatement() throws RecognitionException {
@@ -473,6 +513,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_forStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterForStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitForStatement(this);
+		}
 	}
 
 	public final ForStatementContext forStatement() throws RecognitionException {
@@ -538,6 +586,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_untilStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterUntilStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitUntilStatement(this);
+		}
 	}
 
 	public final UntilStatementContext untilStatement() throws RecognitionException {
@@ -591,6 +647,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_outputStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterOutputStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitOutputStatement(this);
+		}
 	}
 
 	public final OutputStatementContext outputStatement() throws RecognitionException {
@@ -625,6 +689,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_drawStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterDrawStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitDrawStatement(this);
+		}
 	}
 
 	public final DrawStatementContext drawStatement() throws RecognitionException {
@@ -660,6 +732,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_storeStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterStoreStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitStoreStatement(this);
+		}
 	}
 
 	public final StoreStatementContext storeStatement() throws RecognitionException {
@@ -699,6 +779,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_appendStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterAppendStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitAppendStatement(this);
+		}
 	}
 
 	public final AppendStatementContext appendStatement() throws RecognitionException {
@@ -744,6 +832,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public LoadExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterLoadExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitLoadExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class StringConversionExprContext extends ExpressionContext {
@@ -751,11 +847,27 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public StringConversionExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterStringConversionExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitStringConversionExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ReadExprContext extends ExpressionContext {
 		public TerminalNode STRING() { return getToken(imlParser.STRING, 0); }
 		public ReadExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterReadExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitReadExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ComparisonExprContext extends ExpressionContext {
@@ -769,6 +881,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public ComparisonExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterComparisonExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitComparisonExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CountPixelExprContext extends ExpressionContext {
@@ -779,6 +899,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public CountPixelExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterCountPixelExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitCountPixelExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class AnyPixelExprContext extends ExpressionContext {
@@ -788,6 +916,14 @@ public class imlParser extends Parser {
 		}
 		public TerminalNode NUMBER() { return getToken(imlParser.NUMBER, 0); }
 		public AnyPixelExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterAnyPixelExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitAnyPixelExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class RowsExprContext extends ExpressionContext {
@@ -795,6 +931,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public RowsExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterRowsExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitRowsExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ParenExprContext extends ExpressionContext {
@@ -802,6 +946,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public ParenExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterParenExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitParenExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ColumnsExprContext extends ExpressionContext {
@@ -809,6 +961,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public ColumnsExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterColumnsExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitColumnsExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ImageArithmeticExprContext extends ExpressionContext {
@@ -822,6 +982,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public ImageArithmeticExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterImageArithmeticExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitImageArithmeticExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class PrimaryExprContext extends ExpressionContext {
@@ -829,6 +997,14 @@ public class imlParser extends Parser {
 			return getRuleContext(PrimaryContext.class,0);
 		}
 		public PrimaryExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterPrimaryExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitPrimaryExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ErodeExprContext extends ExpressionContext {
@@ -839,6 +1015,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public ErodeExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterErodeExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitErodeExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class OpenExprContext extends ExpressionContext {
@@ -849,6 +1033,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public OpenExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterOpenExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitOpenExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class CloseExprContext extends ExpressionContext {
@@ -859,6 +1051,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public CloseExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterCloseExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitCloseExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class TopHatExprContext extends ExpressionContext {
@@ -869,6 +1069,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public TopHatExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterTopHatExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitTopHatExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArithmeticExprContext extends ExpressionContext {
@@ -882,6 +1090,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public ArithmeticExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterArithmeticExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitArithmeticExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class RunExprContext extends ExpressionContext {
@@ -889,6 +1105,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,0);
 		}
 		public RunExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterRunExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitRunExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class BlackHatExprContext extends ExpressionContext {
@@ -899,6 +1123,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public BlackHatExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterBlackHatExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitBlackHatExpr(this);
+		}
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class DilateExprContext extends ExpressionContext {
@@ -909,6 +1141,14 @@ public class imlParser extends Parser {
 			return getRuleContext(ExpressionContext.class,i);
 		}
 		public DilateExprContext(ExpressionContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterDilateExpr(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitDilateExpr(this);
+		}
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -1324,6 +1564,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_primary; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterPrimary(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitPrimary(this);
+		}
 	}
 
 	public final PrimaryContext primary() throws RecognitionException {
@@ -1395,6 +1643,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_list; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterList(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitList(this);
+		}
 	}
 
 	public final ListContext list() throws RecognitionException {
@@ -1456,6 +1712,14 @@ public class imlParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_type; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).enterType(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof imlListener ) ((imlListener)listener).exitType(this);
+		}
 	}
 
 	public final TypeContext type() throws RecognitionException {
