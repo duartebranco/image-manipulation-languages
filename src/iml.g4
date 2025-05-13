@@ -14,6 +14,8 @@ statement
     | drawStatement
     | storeStatement
     | appendStatement
+    | imageStatement
+    | placeStatement
     | COMMENT
     ;
 
@@ -53,6 +55,21 @@ appendStatement
     : ID 'append' expression
     ;
 
+imageStatement
+    : 'image' 'size' expression 'by' expression 'background' expression
+    ;
+
+placeStatement
+    : 'place' shape 'radius' expression 'at' expression expression 'with' 'intensity' expression
+    ;
+
+shape
+    : 'circle'
+    | 'rect'
+    | 'cross'
+    | 'plus'
+    ;
+
 expression
     : primary                                                       #primaryExpr
     | expression 'open' 'by' expression                             #openExpr
@@ -69,6 +86,7 @@ expression
     | 'columns' 'of' expression                                     #columnsExpr
     | 'rows' 'of' expression                                        #rowsExpr
     | 'string' '(' expression ')'                                   #stringConversionExpr
+    | 'number' '(' expression ')'                                   #numberConversionExpr
     | '(' expression ')'                                            #parenExpr
     | left=expression operator=('*'|'/') right=expression           #arithmeticExpr
     | left=expression operator=('+'|'-') right=expression           #arithmeticExpr
