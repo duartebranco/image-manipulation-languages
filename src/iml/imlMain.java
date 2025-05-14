@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -13,7 +14,8 @@ public class imlMain {
       }
       try {
          // read from file rather than stdin:
-         CharStream input = CharStreams.fromFileName(args[0]);
+         String srcFile = args[0];
+         CharStream input = CharStreams.fromFileName(srcFile);
          imlLexer lexer   = new imlLexer(input);
          CommonTokenStream tokens = new CommonTokenStream(lexer);
          imlParser parser = new imlParser(tokens);
@@ -22,11 +24,15 @@ public class imlMain {
          if (parser.getNumberOfSyntaxErrors() == 0) {
             CodeGenVisitor visitor0 = new CodeGenVisitor();
             visitor0.visit(tree);
-
-            // write Python to out.py:
+            // write Python
             String py = visitor0.getCode();
-            Files.writeString(Path.of("out.py"), py);
-            System.out.println("→ generated out.py");
+            String base = Paths.get(srcFile).getFileName().toString();
+            base = base.substring(0, base.lastIndexOf('.'));         
+            Path outDir = Paths.get("../../output");
+            Files.createDirectories(outDir);
+            Path outFile = outDir.resolve(base + ".py");
+            Files.writeString(outFile, py);
+            System.out.println("→ generated " + outFile);
          }
       }
       catch(IOException e) {
