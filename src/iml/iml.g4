@@ -70,10 +70,12 @@ expression
     | 'rows' 'of' expression                                        #rowsExpr
     | 'string' '(' expression ')'                                   #stringConversionExpr
     | '(' expression ')'                                            #parenExpr
-    | left=expression operator=('*'|'/') right=expression           #arithmeticExpr
-    | left=expression operator=('+'|'-') right=expression           #arithmeticExpr
-    | left=expression operator=('.*'|'.+') right=expression         #imageArithmeticExpr
-    | left=expression operator=('.-'|'-*'|'|*') right=expression    #imageArithmeticExpr
+    // flip op (vertical, horizontal, both, respectivaly)
+    | left=expression operator=('-'|'/'|'+') right=expression       #flipExpr 
+    // scale op (vertical, horizontal, both, respectivaly)       
+    | left=expression operator=('|*'|'-*'|'+*') right=expression    #scaleExpr
+    // pixel by pixel operations
+    | left=expression operator=('.*'|'.+'|'.-') right=expression    #pixelOperationExpr
     | left=expression operator=('!='|'==') right=expression         #comparisonExpr
     ;
 

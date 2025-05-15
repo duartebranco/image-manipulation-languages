@@ -10,4 +10,4 @@ __pycache__
 *.jar
 
 iml.pdf
-.antlr
+.antlr/

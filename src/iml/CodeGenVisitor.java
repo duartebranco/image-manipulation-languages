@@ -81,17 +81,18 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       return null;
    }
 
-   @Override public String visitStoreStatement(imlParser.StoreStatementContext ctx) {
+   @Override 
+   public String visitStoreStatement(imlParser.StoreStatementContext ctx) {
       // <expr> store into "images/yyy.pgm" → save "examples/images/yyy.pgm"
       String img = visit(ctx.expression());
-      String raw = ctx.STRING().getText();                  // p.ex. "\"images/copy.pgm\""
-      String lit = raw.substring(1, raw.length()-1);       // images/copy.pgm
+      String raw = ctx.STRING().getText();                  // e.g. "\"images/copy.pgm\""
+      String lit = raw.substring(1, raw.length()-1);        // images/copy.pgm
       String quoted = "\"examples/" + lit + "\"";
-      sb.append("Image.fromarray(")
-        .append(img)
-        .append(").save(")
-        .append(quoted)
-        .append(")\n");
+      sb.append("Image.fromarray(np.clip(")
+         .append(img)
+         .append(", 0, 255).astype(np.uint8)).save(")
+         .append(quoted)
+         .append(")\n");
       return null;
    }
 
@@ -120,11 +121,13 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       return "input(" + ctx.STRING().getText() + ")";
    }
 
-   @Override public String visitComparisonExpr(imlParser.ComparisonExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
-   }
+   @Override
+   public String visitComparisonExpr(imlParser.ComparisonExprContext ctx) {
+      String left = visit(ctx.left);
+      String right = visit(ctx.right);
+      String op = ctx.operator.getText();
+      return left + " " + op + " " + right;
+   }   
 
    @Override public String visitCountPixelExpr(imlParser.CountPixelExprContext ctx) {
       String res = null;
@@ -144,50 +147,12 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitParenExpr(imlParser.ParenExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      return "(" + visit(ctx.expression()) + ")";
    }
 
    @Override public String visitColumnsExpr(imlParser.ColumnsExprContext ctx) {
       // “columns of X” → número de colunas em X
       return visit(ctx.expression()) + ".shape[1]";
-   }
-
-   @Override public String visitImageArithmeticExpr(imlParser.ImageArithmeticExprContext ctx) {
-      String L  = visit(ctx.left);
-      String op = ctx.operator.getText();
-      String R  = visit(ctx.right);
-
-      switch(op) {
-         // pixel‐a‐pixel
-         case ".*":   // multiplicação
-            return "(" + L + " * " + R + ")";
-         case ".+":   // soma
-            return "(" + L + " + " + R + ")";
-         case ".-":   // subtração
-            return "(" + L + " - " + R + ")";
-
-         // inversão de intensidades: .- unário
-         // aqui assumimos 8-bits (0–255)
-         case ".~":   // supondo que voce mude o grammar para unário .~ 
-            return "(255 - " + L + ")";
-
-         // escalamento
-         case "-*":   // escala horizontal
-            return "np.repeat(" + L + ", int(" + R + "), axis=1)";
-         case "|*":   // escala vertical
-            return "np.repeat(" + L + ", int(" + R + "), axis=0)";
-         case "+*":   // escala em ambos eixos
-            return "np.repeat(np.repeat(" + L + ", int(" + R + "), axis=0), int(" + R + "), axis=1)";
-
-         default:
-            // se vier “.-” como unário, trate como invert:
-            if (op.equals(".-") && ctx.right==null) {
-               return "(255 - " + L + ")";
-            }
-            throw new UnsupportedOperationException("operador desconhecido: " + op);
-      }
    }
 
    @Override public String visitPrimaryExpr(imlParser.PrimaryExprContext ctx) {
@@ -216,13 +181,6 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String res = null;
       return visitChildren(ctx);
       //return res;
-   }
-
-   @Override public String visitArithmeticExpr(imlParser.ArithmeticExprContext ctx) {
-      String left  = visit(ctx.left);
-      String op    = ctx.operator.getText();
-      String right = visit(ctx.right);
-      return "(" + left + " " + op + " " + right + ")";
    }
 
    @Override public String visitRunExpr(imlParser.RunExprContext ctx) {
@@ -266,5 +224,41 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String res = null;
       return visitChildren(ctx);
       //return res;
+   }
+
+   @Override
+   public String visitPixelOperationExpr(imlParser.PixelOperationExprContext ctx) {
+      String left = visit(ctx.left);
+      String right = visit(ctx.right);
+      String op = ctx.operator.getText();
+      switch (op) {
+         case ".*": return left + " * " + right;
+         case ".+": return left + " + " + right;
+         case ".-": return left + " - " + right;
+         default: return left + " " + op + " " + right;
+      }
+   }
+
+   @Override
+   public String visitScaleExpr(imlParser.ScaleExprContext ctx) {
+      String left = visit(ctx.left);
+      String right = visit(ctx.right);
+      String op = ctx.operator.getText();
+      // Use PIL.Image.resize for scaling
+      String axis;
+      switch (op) {
+         case "|*": axis = "vertical"; break;
+         case "-*": axis = "horizontal"; break;
+         case "+*": axis = "both"; break;
+         default: axis = "both";
+      }
+      // For simplicity, assume right is a float or int
+      if (axis.equals("vertical")) {
+         return "np.array(Image.fromarray(" + left + ").resize((" + left + ".shape[1], int(" + left + ".shape[0] * " + right + "))))";
+      } else if (axis.equals("horizontal")) {
+         return "np.array(Image.fromarray(" + left + ").resize((int(" + left + ".shape[1] * " + right + "), " + left + ".shape[0])))";
+      } else {
+         return "np.array(Image.fromarray(" + left + ").resize((int(" + left + ".shape[1] * " + right + "), int(" + left + ".shape[0] * " + right + "))))";
+      }
    }
 }
