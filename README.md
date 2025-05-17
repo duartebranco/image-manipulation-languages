@@ -18,11 +18,11 @@
 
 - [ ] Suporte ao tipo `image`, com representação em tons de cinzento no intervalo `[0, 1]`
 - [ ] Instruções:
-  - [ ] `image i is load from "ficheiro.pgm"`
-  - [ ] `i store into "ficheiro.pgm"`
-  - [ ] `draw i`
-  - [ ] `output expr`
-  - [ ] `read "mensagem"`
+  - [x] `image i is load from "ficheiro.pgm"`
+  - [x] `i store into "ficheiro.pgm"`
+  - [x] `draw i`
+  - [x] `output expr`
+  - [x] `read "mensagem"`
   - [ ] Execução da linguagem IIML com `run from "ficheiro.iiml"`
 - [ ] Operações pixel a pixel:
   - [ ] `.+`, `.-`, `.*`, etc.
@@ -41,7 +41,7 @@
 - [ ] Expressões booleanas com operadores de comparação e lógicos
 - [ ] Instruções condicionais com expressões booleanas
 - [ ] Operadores:
-  - [ ] `any pixel expr > n`
+  - [x] `any pixel expr > n`
   - [ ] `all pixel expr > n`
   - [ ] `count pixel expr in imagem`
 - [ ] Suporte ao tipo `list of T`
@@ -63,8 +63,8 @@
 
 - [x] `min-01.iml`
 - [x] `min-02.iml`
-- [ ] `min-03.iml`
-- [ ] `des-01.iml`
+- [ ] `min-03.iml` (preciso 2ª gramatica)
+- [x] `des-01.iml`
 - [ ] `des-02.iml`
 - [ ] `des-03.iml`
 - [ ] `des-04.iml`

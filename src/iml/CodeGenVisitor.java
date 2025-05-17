@@ -12,7 +12,8 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       // emit Python header
       sb.append("#!/usr/bin/env python3\n")
          .append("from PIL import Image\n")
-         .append("import numpy as np\n\n");
+         .append("import numpy as np\n")
+         .append("import cv2\n\n");
       // visit each statement
       for (imlParser.StatementContext st : ctx.statement()) {
          visit(st);
@@ -45,12 +46,23 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitIfStatement(imlParser.IfStatementContext ctx) {
-      // if cond then stmts done
-      String cond = visit(ctx.expression());
+     String cond = visit(ctx.expression());
       sb.append("if ").append(cond).append(":\n");
-      for (var st : ctx.statement()) {
-         sb.append("    ");
+
+      // Process statements in the 'then' block
+      for (imlParser.StatementContext st : ctx.thenStmts) { // Use the 'thenStmts' label
+         sb.append("    "); // Add indentation
          visit(st);
+      }
+
+      // Check if there is an 'else' block
+      if (ctx.elseStmts != null && !ctx.elseStmts.isEmpty()) { // Use the 'elseStmts' label
+         sb.append("else:\n");
+         // Process statements in the 'else' block
+         for (imlParser.StatementContext st : ctx.elseStmts) {
+            sb.append("    "); // Add indentation
+            visit(st);
+         }
       }
       return null;
    }
@@ -136,9 +148,14 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitAnyPixelExpr(imlParser.AnyPixelExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String image = visit(ctx.expression());
+      String op = ctx.operator.getText();
+      String number = ctx.NUMBER().getText();
+
+      // Convert operator if needed
+      if (op.equals(".>")) op = ">";
+
+      return "np.any(" + image + " " + op + " " + number + ")";
    }
 
    @Override public String visitRowsExpr(imlParser.RowsExprContext ctx) {
@@ -165,16 +182,29 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       //return res;
    }
 
+   private int tempVarCounter = 0;
+   private String getTempVar() {
+      return "_temp" + (tempVarCounter++);
+   }
+
    @Override public String visitOpenExpr(imlParser.OpenExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String input = visit(ctx.expression(0)); 
+      String kernel = visit(ctx.expression(1));
+      String tempVar = getTempVar();            
+      
+      sb.append(tempVar).append(" = cv2.morphologyEx(").append(input)
+        .append(", cv2.MORPH_OPEN, ").append(kernel).append(")\n");
+      return tempVar; // Return the name of the variable holding the result
    }
 
    @Override public String visitCloseExpr(imlParser.CloseExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String input = visit(ctx.expression(0));
+      String kernel = visit(ctx.expression(1));
+      String tempVar = getTempVar();
+
+      sb.append(tempVar).append(" = cv2.morphologyEx(").append(input)
+        .append(", cv2.MORPH_CLOSE, ").append(kernel).append(")\n");
+      return tempVar; // Return the name of the variable holding the result
    }
 
    @Override public String visitTopHatExpr(imlParser.TopHatExprContext ctx) {

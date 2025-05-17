@@ -26,7 +26,7 @@ assignment
     ;
 
 ifStatement
-    : 'if' expression 'then' statement+ ('else' statement+)? 'done'
+    : 'if' expression 'then' thenStmts+=statement+ ('else' elseStmts+=statement+)? 'done'
     ;
 
 forStatement
@@ -59,10 +59,13 @@ expression
     | expression 'close' 'by' expression                            #closeExpr
     | expression 'dilate' 'by' expression                           #dilateExpr
     | expression 'erode' 'by' expression                            #erodeExpr
+
     | expression 'top' 'hat' 'by' expression                        #topHatExpr
     | expression 'black' 'hat' 'by' expression                      #blackHatExpr
+
     | 'load' 'from' expression                                      #loadExpr
     | 'run' 'from' expression                                       #runExpr
+
     | 'read' STRING                                                 #readExpr
     | 'count' 'pixel' expression 'in' expression                    #countPixelExpr
     | 'any' 'pixel' expression operator=('>'|'.>') NUMBER           #anyPixelExpr
@@ -70,6 +73,7 @@ expression
     | 'rows' 'of' expression                                        #rowsExpr
     | 'string' '(' expression ')'                                   #stringConversionExpr
     | '(' expression ')'                                            #parenExpr
+
     // flip op (vertical, horizontal, both, respectivaly)
     | left=expression operator=('-'|'/'|'+') right=expression       #flipExpr 
     // scale op (vertical, horizontal, both, respectivaly)       
