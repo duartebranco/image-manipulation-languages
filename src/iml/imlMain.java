@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
@@ -21,7 +22,16 @@ public class imlMain {
          imlParser parser = new imlParser(tokens);
          ParseTree tree    = parser.program();
 
-         if (parser.getNumberOfSyntaxErrors() == 0) {
+         if (parser.getNumberOfSyntaxErrors() > 0) {
+            System.err.println("Aborting due to syntax errors.");
+            System.exit(1);
+         }
+
+         ParseTreeWalker walker = new ParseTreeWalker();
+         ValidationListener listener = new ValidationListener();
+         walker.walk(listener, tree);
+
+         if (!listener.hasError()) {
             CodeGenVisitor visitor0 = new CodeGenVisitor();
             visitor0.visit(tree);
             // write Python
