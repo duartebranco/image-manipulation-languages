@@ -88,6 +88,7 @@ primary
     | NUMBER
     | PERCENTAGE
     | STRING
+    | BOOLEAN
     | list
     ;
 
@@ -100,6 +101,7 @@ type
     | 'number'
     | 'string'
     | 'percentage'
+    | 'boolean'
     | 'list' 'of' type
     ;
 
@@ -117,6 +119,11 @@ STRING
 
 ID
     : [a-zA-Z][a-zA-Z0-9_]*
+    ;
+
+BOOLEAN
+    : 'true'
+    | 'false'
     ;
 
 COMMENT

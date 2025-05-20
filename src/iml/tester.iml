@@ -1,0 +1,13 @@
+string a is "sfrtg"
+string d is "sfrtg2"
+
+a is 345
+a is "frge"
+b is "ewrgfd"
+
+if a == d then
+    number e is 13
+    number f is "39"
+else
+    number e is "13"
+done

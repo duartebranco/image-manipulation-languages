@@ -57,4 +57,65 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
     public String visitCountPixelExpr(imlParser.CountPixelExprContext ctx) {
         return "number";
     }
+
+    @Override
+    public String visitComparisonExpr(imlParser.ComparisonExprContext ctx) {
+        return "boolean";
+    }
+
+    @Override
+    public String visitAnyPixelExpr(imlParser.AnyPixelExprContext ctx) {
+        return "boolean";
+    }
+
+    @Override
+    public String visitTopHatExpr(imlParser.TopHatExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitBlackHatExpr(imlParser.BlackHatExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitOpenExpr(imlParser.OpenExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitCloseExpr(imlParser.CloseExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitDilateExpr(imlParser.DilateExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitErodeExpr(imlParser.ErodeExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitRunExpr(imlParser.RunExprContext ctx) {
+        return "image";
+    }
+
+    @Override
+    public String visitReadExpr(imlParser.ReadExprContext ctx) {
+        return "string";
+    }
+
+    @Override
+    public String visitColumnsExpr(imlParser.ColumnsExprContext ctx) {
+        return "number";
+    }
+
+    @Override
+    public String visitRowsExpr(imlParser.RowsExprContext ctx) {
+        return "number";
+    }
+
 }
