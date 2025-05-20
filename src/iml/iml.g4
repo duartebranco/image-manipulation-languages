@@ -97,12 +97,12 @@ list
     ;
 
 type
-    : 'image'
-    | 'number'
-    | 'string'
-    | 'percentage'
-    | 'boolean'
-    | 'list' 'of' type
+    : 'image '
+    | 'number '
+    | 'string '
+    | 'percentage '
+    | 'boolean '
+    | 'list ' 'of ' type
     ;
 
 PERCENTAGE

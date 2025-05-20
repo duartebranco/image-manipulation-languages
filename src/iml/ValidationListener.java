@@ -36,7 +36,7 @@ public class ValidationListener extends imlBaseListener {
             error = true;
             return;
         } else {
-            declaredVariables.put(variableName, declaredType);
+            declaredVariables.put(variableName, inferredType);
         }
 
     }
