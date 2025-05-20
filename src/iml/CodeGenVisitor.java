@@ -74,9 +74,13 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitUntilStatement(imlParser.UntilStatementContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String condition = visit(ctx.expression());
+      sb.append("while (").append(condition).append("):\n");
+      for (imlParser.StatementContext stmt : ctx.statement()) {
+         sb.append("    ");
+         visit(stmt);
+      }
+      return null;
    }
 
    @Override public String visitOutputStatement(imlParser.OutputStatementContext ctx) {
@@ -95,31 +99,46 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
    @Override 
    public String visitStoreStatement(imlParser.StoreStatementContext ctx) {
-      // <expr> store into "images/yyy.pgm" → save "examples/images/yyy.pgm"
-      String img = visit(ctx.expression());
-      String raw = ctx.STRING().getText();                  // e.g. "\"images/copy.pgm\""
-      String lit = raw.substring(1, raw.length()-1);        // images/copy.pgm
-      String quoted = "\"examples/" + lit + "\"";
-      sb.append("Image.fromarray(np.clip(")
-         .append(img)
-         .append(", 0, 255).astype(np.uint8)).save(")
-         .append(quoted)
-         .append(")\n");
+      String exprToStore = visit(ctx.expression());
+      String rawPath = ctx.STRING().getText(); // e.g., "\"animation.gif\""
+      String relPath = rawPath.substring(1, rawPath.length() - 1); // e.g., "animation.gif"
+
+      // pythonStringLiteralForSave is a Java string that represents a Python string literal.
+      // e.g., "\"examples/animation.gif\"". This is correct for save() methods.
+      String pythonStringLiteralForSave = "\"examples/" + relPath + "\"";
+
+      // pathContentForFString is the raw path, e.g., "examples/animation.gif".
+      // This will be wrapped in single quotes within the f-string.
+      String pathContentForFString = "examples/" + relPath;
+
+      sb.append("if isinstance(").append(exprToStore).append(", list):\n");
+      sb.append("    _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in ").append(exprToStore).append("]\n");
+      sb.append("    if _pil_images_for_gif:\n");
+      sb.append("        _pil_images_for_gif[0].save(").append(pythonStringLiteralForSave)
+        .append(", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)\n");
+      sb.append("    else:\n");
+      // Corrected f-string: use single quotes for the path literal inside the f-string expression
+      sb.append("        print(f\"Warning: Image list '").append(exprToStore.replace("\"", "\\\""))
+        .append("' is empty. Cannot save GIF to {'").append(pathContentForFString).append("'}\")\n");
+      sb.append("elif isinstance(").append(exprToStore).append(", np.ndarray):\n");
+      sb.append("    Image.fromarray(np.clip(").append(exprToStore)
+        .append(", 0, 255).astype(np.uint8)).save(").append(pythonStringLiteralForSave).append(")\n");
+      sb.append("else:\n");
+      sb.append("    print(f\"Error: Cannot store type {type(").append(exprToStore).append(")} as image/GIF for expression '").append(exprToStore.replace("\"", "\\\"")).append("'.\")\n");
       return null;
    }
 
+
    @Override public String visitAppendStatement(imlParser.AppendStatementContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String listName = ctx.ID().getText();
+      String itemToAppend = visit(ctx.expression());
+      sb.append(listName).append(".append(").append(itemToAppend).append(")\n");
+      return null;
    }
 
    @Override public String visitLoadExpr(imlParser.LoadExprContext ctx) {
-      // load from "path"
-      String raw = ctx.expression().getText();              // p.ex. "\"images/sample00.pgm\""
-      String lit = raw.substring(1, raw.length()-1);       // images/sample00.pgm
-      String quoted = "\"examples/" + lit + "\"";          
-      return "np.array(Image.open(" + quoted + ").convert('L'))";
+      String pathSuffixExpr = visit(ctx.expression());
+      return "np.array(Image.open(\"examples/\" + (" + pathSuffixExpr + ")).convert('L'))";
    }
 
    @Override public String visitStringConversionExpr(imlParser.StringConversionExprContext ctx) {
@@ -177,9 +196,9 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitErodeExpr(imlParser.ErodeExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String image = visit(ctx.expression(0));
+      String kernel = visit(ctx.expression(1));
+      return "cv2.erode(" + image + ", " + kernel + ", iterations=1)";
    }
 
    private int tempVarCounter = 0;
@@ -244,6 +263,9 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitList(imlParser.ListContext ctx) {
+      if (ctx.expression() == null || ctx.expression().isEmpty()) {
+         return "[]";
+      }
       var elems = ctx.expression().stream()
                      .map(this::visit)
                      .collect(Collectors.joining(", "));
