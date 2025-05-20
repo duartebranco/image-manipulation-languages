@@ -71,7 +71,7 @@ public class ValidationListener extends imlBaseListener {
         TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
         String inferredType = typeVisitor.visit(ctx.expression());
 
-        if (!inferredType.equals("boolean")) {
+        if (!inferredType.equals("boolean ")) {
             System.err.println("Type error: if statement is invalid");
         }
 

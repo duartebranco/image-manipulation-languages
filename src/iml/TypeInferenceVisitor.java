@@ -21,22 +21,22 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
     public String visitPrimary(imlParser.PrimaryContext ctx) {
         if (ctx.ID() != null) {
             String id = ctx.ID().getText();
-            return symbolTable.getOrDefault(id, "unknown");
+            return symbolTable.getOrDefault(id, "unknown ");
         } else if (ctx.NUMBER() != null) {
-            return "number";
+            return "number ";
         } else if (ctx.PERCENTAGE() != null) {
-            return "percentage";
+            return "percentage ";
         } else if (ctx.STRING() != null) {
-            return "string";
+            return "string ";
         } else if (ctx.list() != null) {
             return visit(ctx.list());
         }
-        return "unknown";
+        return "unknown ";
     }
 
     @Override
     public String visitList(imlParser.ListContext ctx) {
-        if (ctx.expression().isEmpty()) return "list of unknown";
+        if (ctx.expression().isEmpty()) return "list of unknown ";
 
         // Infer the type of the first element and assume homogeneity
         String elementType = visit(ctx.expression(0));
@@ -45,77 +45,97 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
 
     @Override
     public String visitLoadExpr(imlParser.LoadExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitStringConversionExpr(imlParser.StringConversionExprContext ctx) {
-        return "string";
+        return "string ";
     }
 
     @Override
     public String visitCountPixelExpr(imlParser.CountPixelExprContext ctx) {
-        return "number";
+        return "number ";
     }
 
     @Override
     public String visitComparisonExpr(imlParser.ComparisonExprContext ctx) {
-        return "boolean";
+        return "boolean ";
     }
 
     @Override
     public String visitAnyPixelExpr(imlParser.AnyPixelExprContext ctx) {
-        return "boolean";
+        return "boolean ";
     }
 
     @Override
     public String visitTopHatExpr(imlParser.TopHatExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitBlackHatExpr(imlParser.BlackHatExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitOpenExpr(imlParser.OpenExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitCloseExpr(imlParser.CloseExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitDilateExpr(imlParser.DilateExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitErodeExpr(imlParser.ErodeExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitRunExpr(imlParser.RunExprContext ctx) {
-        return "image";
+        return "image ";
     }
 
     @Override
     public String visitReadExpr(imlParser.ReadExprContext ctx) {
-        return "string";
+        return "string ";
     }
 
     @Override
     public String visitColumnsExpr(imlParser.ColumnsExprContext ctx) {
-        return "number";
+        return "number ";
     }
 
     @Override
     public String visitRowsExpr(imlParser.RowsExprContext ctx) {
-        return "number";
+        return "number ";
+    }
+
+    @Override
+    public String visitParenExpr(imlParser.ParenExprContext ctx) {
+        return visit(ctx.expression());
+    }
+
+    @Override
+    public String visitFlipExpr(imlParser.FlipExprContext ctx) {
+        return "image ";
+    }
+
+    @Override
+    public String visitScaleExpr(imlParser.ScaleExprContext ctx) {
+        return "image ";
+    }
+
+    @Override
+    public String visitPixelOperationExpr(imlParser.PixelOperationExprContext ctx) {
+        return "image ";
     }
 
 }
