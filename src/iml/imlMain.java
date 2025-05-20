@@ -31,7 +31,7 @@ public class imlMain {
          ValidationListener listener = new ValidationListener();
          walker.walk(listener, tree);
 
-         if (!listener.hasError()) {
+         //if (!listener.hasError()) {
             CodeGenVisitor visitor0 = new CodeGenVisitor();
             visitor0.visit(tree);
             // write Python
@@ -43,7 +43,7 @@ public class imlMain {
             Path outFile = outDir.resolve(base + ".py");
             Files.writeString(outFile, py);
             System.out.println("→ generated " + outFile);
-         }
+         //}
       }
       catch(IOException e) {
          e.printStackTrace();
