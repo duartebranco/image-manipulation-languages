@@ -3,11 +3,12 @@ from PIL import Image
 import numpy as np
 import cv2
 
-i = np.array(Image.open("examples/" + (input("Path: "))).convert('L'))
-k = np.array(Image.open("examples/" + ("images/kernel00.pgm")).convert('L'))
+i = np.array(Image.open("examples/" + (input("Path: "))).convert('L')) / 255.0
+k = np.array(Image.open("examples/" + ("images/kernel00.pgm")).convert('L')) / 255.0
 l = []
 while (np.any(i > 0)):
-    Image.fromarray(i).show()
+    Image.fromarray(np.clip((i) * 255, 0, 255).astype(np.uint8)).show()
+    k = np.array(k, dtype=np.uint8)
     i = cv2.erode(i, k, iterations=1)
     l.append(i)
 if isinstance(l, list):
@@ -17,6 +18,6 @@ if isinstance(l, list):
     else:
         print(f"Warning: Image list 'l' is empty. Cannot save GIF to {'examples/animation.gif'}")
 elif isinstance(l, np.ndarray):
-    Image.fromarray(np.clip(l, 0, 255).astype(np.uint8)).save("examples/animation.gif")
+    Image.fromarray(np.clip((l) * 255, 0, 255).astype(np.uint8)).save("examples/animation.gif")
 else:
     print(f"Error: Cannot store type {type(l)} as image/GIF for expression 'l'.")

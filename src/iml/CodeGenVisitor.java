@@ -1,3 +1,5 @@
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 @SuppressWarnings("CheckReturnValue")
 public class CodeGenVisitor extends imlBaseVisitor<String> {
@@ -6,6 +8,22 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
     
    public String getCode() {
       return sb.toString();
+   }
+
+   private int tempVarCounter = 0;
+   
+   private String getTempVar() {
+      return "_temp" + (tempVarCounter++);
+   }
+
+   private Set<String> convertedKernels = new HashSet<>();
+
+   private String ensureKernelIsNumpy(String kernelVar) {
+      if (!convertedKernels.contains(kernelVar)) {
+         convertedKernels.add(kernelVar);
+         return kernelVar + " = np.array(" + kernelVar + ", dtype=np.uint8)\n";
+      }
+      return null;
    }
 
    @Override public String visitProgram(imlParser.ProgramContext ctx) {
@@ -29,19 +47,35 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
    @Override public String visitVariableDeclaration(imlParser.VariableDeclarationContext ctx) {
       // emit:   <name> = <expr>
-      sb.append(ctx.ID().getText())
-         .append(" = ")
-         .append(visit(ctx.expression()))
-         .append("\n");
+      String varName = ctx.ID().getText();
+      String exprResult = visit(ctx.expression());
+      // If exprResult is a temp variable (starts with _temp), assign it to varName
+      if (exprResult.startsWith("_temp")) {
+         sb.append(varName).append(" = ").append(exprResult).append("\n");
+      } else {
+         sb.append(varName).append(" = ").append(exprResult).append("\n");
+      }
       return null;
    }
 
    @Override public String visitAssignment(imlParser.AssignmentContext ctx) {
-      // emit:   <name> = <expr>
-      sb.append(ctx.ID().getText())
-         .append(" = ")
-         .append(visit(ctx.expression()))
-         .append("\n");
+      String rhs = visit(ctx.expression());
+      if (rhs.contains("\0")) {
+         String[] parts = rhs.split("\0");
+         for (String line : parts[0].split("\n")) {
+               if (!line.isEmpty()) sb.append(line).append("\n");
+         }
+         sb.append(ctx.ID().getText())
+            .append(" = ")
+            .append(parts[1])
+            .append("\n");
+      } else {
+         sb.append(ctx.ID().getText())
+            .append(" = ")
+            .append(rhs)
+            .append("\n");
+      }
+      System.err.println("DEBUG: [assignment] " + ctx.ID().getText() + " = " + rhs);
       return null;
    }
 
@@ -67,20 +101,46 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       return null;
    }
 
-   @Override public String visitForStatement(imlParser.ForStatementContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+   @Override 
+   public String visitForStatement(imlParser.ForStatementContext ctx) {
+      String type = ctx.type().getText().trim(); // e.g., "percentage"
+      String var = ctx.ID().getText();           // e.g., "p"
+      String iterable = visit(ctx.expression()); // e.g., "l"
+
+      sb.append("for ").append(var).append(" in ").append(iterable).append(":\n");
+      for (imlParser.StatementContext st : ctx.statement()) {
+         sb.append("    ");
+         visit(st);
+      }
+      return null;
    }
 
    @Override public String visitUntilStatement(imlParser.UntilStatementContext ctx) {
       String condition = visit(ctx.expression());
       sb.append("while (").append(condition).append("):\n");
       for (imlParser.StatementContext stmt : ctx.statement()) {
-         sb.append("    ");
-         visit(stmt);
+         visitIndented(stmt, "    ");
       }
       return null;
+   }
+
+   private void visitIndented(imlParser.StatementContext ctx, String indent) {
+      int before = sb.length();
+      visitWithIndent(ctx, indent);
+      int after = sb.length();
+      // Indent all lines generated for this statement
+      String[] lines = sb.substring(before, after).split("\n", -1);
+      sb.delete(before, after);
+      for (String line : lines) {
+         if (!line.isEmpty()) {
+               sb.append(indent).append(line).append("\n");
+         }
+      }
+   }
+
+   // Overload for assignment and other statements
+   private void visitWithIndent(imlParser.StatementContext ctx, String indent) {
+      visit(ctx);
    }
 
    @Override public String visitOutputStatement(imlParser.OutputStatementContext ctx) {
@@ -91,9 +151,10 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitDrawStatement(imlParser.DrawStatementContext ctx) {
-      sb.append("Image.fromarray(")
-         .append(visit(ctx.expression()))
-         .append(").show()\n");
+      String expr = visit(ctx.expression());
+      sb.append("Image.fromarray(np.clip((")
+      .append(expr)
+      .append(") * 255, 0, 255).astype(np.uint8)).show()\n");
       return null;
    }
 
@@ -121,8 +182,8 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       sb.append("        print(f\"Warning: Image list '").append(exprToStore.replace("\"", "\\\""))
         .append("' is empty. Cannot save GIF to {'").append(pathContentForFString).append("'}\")\n");
       sb.append("elif isinstance(").append(exprToStore).append(", np.ndarray):\n");
-      sb.append("    Image.fromarray(np.clip(").append(exprToStore)
-        .append(", 0, 255).astype(np.uint8)).save(").append(pythonStringLiteralForSave).append(")\n");
+      sb.append("    Image.fromarray(np.clip((").append(exprToStore)
+        .append(") * 255, 0, 255).astype(np.uint8)).save(").append(pythonStringLiteralForSave).append(")\n");
       sb.append("else:\n");
       sb.append("    print(f\"Error: Cannot store type {type(").append(exprToStore).append(")} as image/GIF for expression '").append(exprToStore.replace("\"", "\\\"")).append("'.\")\n");
       return null;
@@ -130,15 +191,18 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
 
    @Override public String visitAppendStatement(imlParser.AppendStatementContext ctx) {
+      int before = sb.length();
       String listName = ctx.ID().getText();
       String itemToAppend = visit(ctx.expression());
       sb.append(listName).append(".append(").append(itemToAppend).append(")\n");
+      int after = sb.length();
+      System.err.println("DEBUG: [append] " + sb.substring(before, after));
       return null;
    }
 
    @Override public String visitLoadExpr(imlParser.LoadExprContext ctx) {
-      String pathSuffixExpr = visit(ctx.expression());
-      return "np.array(Image.open(\"examples/\" + (" + pathSuffixExpr + ")).convert('L'))";
+      String pathExpr = visit(ctx.expression());
+      return "np.array(Image.open(\"examples/\" + (" + pathExpr + ")).convert('L')) / 255.0";
    }
 
    @Override public String visitStringConversionExpr(imlParser.StringConversionExprContext ctx) {
@@ -198,56 +262,65 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    @Override public String visitErodeExpr(imlParser.ErodeExprContext ctx) {
       String image = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
+      String kernelConv = ensureKernelIsNumpy(kernel);
+      if (kernelConv != null) {
+         return kernelConv + "\0" + "cv2.erode(" + image + ", " + kernel + ", iterations=1)";
+      }
       return "cv2.erode(" + image + ", " + kernel + ", iterations=1)";
    }
 
-   private int tempVarCounter = 0;
-   private String getTempVar() {
-      return "_temp" + (tempVarCounter++);
-   }
-
    @Override public String visitOpenExpr(imlParser.OpenExprContext ctx) {
-      String input = visit(ctx.expression(0)); 
+      String input = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
-      String tempVar = getTempVar();            
-      
+      ensureKernelIsNumpy(kernel);
+      String tempVar = getTempVar();
       sb.append(tempVar).append(" = cv2.morphologyEx(").append(input)
-        .append(", cv2.MORPH_OPEN, ").append(kernel).append(")\n");
-      return tempVar; // Return the name of the variable holding the result
+         .append(", cv2.MORPH_OPEN, ").append(kernel).append(")\n");
+      return tempVar;
    }
 
    @Override public String visitCloseExpr(imlParser.CloseExprContext ctx) {
       String input = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
+      ensureKernelIsNumpy(kernel);
       String tempVar = getTempVar();
-
       sb.append(tempVar).append(" = cv2.morphologyEx(").append(input)
-        .append(", cv2.MORPH_CLOSE, ").append(kernel).append(")\n");
-      return tempVar; // Return the name of the variable holding the result
+         .append(", cv2.MORPH_CLOSE, ").append(kernel).append(")\n");
+      return tempVar;
    }
 
    @Override public String visitTopHatExpr(imlParser.TopHatExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String img = visit(ctx.expression(0));
+      String kernel = visit(ctx.expression(1));
+      ensureKernelIsNumpy(kernel);
+      String resultVar = getTempVar();
+      sb.append(resultVar + " = cv2.morphologyEx((" + img + " * 255).astype(np.uint8), cv2.MORPH_TOPHAT, " + kernel + ").astype(np.float32) / 255.0\n");
+      return resultVar;
    }
 
+   // 2ª gramática
    @Override public String visitRunExpr(imlParser.RunExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String pathExpr = visit(ctx.expression());
+      return "run_iiml_program(" + pathExpr + ")";
    }
 
    @Override public String visitBlackHatExpr(imlParser.BlackHatExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String img = visit(ctx.expression(0));
+      String kernel = visit(ctx.expression(1));
+      ensureKernelIsNumpy(kernel);
+      String resultVar = getTempVar();
+      sb.append(resultVar + " = cv2.morphologyEx((" + img + " * 255).astype(np.uint8), cv2.MORPH_BLACKHAT, " + kernel + ").astype(np.float32) / 255.0\n");
+      return resultVar;
    }
 
    @Override public String visitDilateExpr(imlParser.DilateExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String image = visit(ctx.expression(0));
+      String kernel = visit(ctx.expression(1));
+      String kernelConv = ensureKernelIsNumpy(kernel);
+      if (kernelConv != null) {
+         return kernelConv + "\0" + "cv2.dilate(" + image + ", " + kernel + ", iterations=1)";
+      }
+      return "cv2.dilate(" + image + ", " + kernel + ", iterations=1)";
    }
 
    @Override public String visitPrimary(imlParser.PrimaryContext ctx) {

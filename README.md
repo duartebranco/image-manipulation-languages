@@ -66,7 +66,7 @@
 - [ ] `min-03.iml` (preciso 2ª gramatica)
 - [x] `des-01.iml`
 - [x] `des-02.iml`
-- [ ] `des-03.iml`
-- [ ] `des-04.iml`
-- [ ] `des-05.iml`
+- [x] `des-03.iml`
+- [ ] `des-04.iml` (preciso 2ª gramatica)
+- [x] `des-05.iml`
 - [ ] `min-01.iiml`

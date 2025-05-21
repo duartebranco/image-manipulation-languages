@@ -3,13 +3,16 @@ from PIL import Image
 import numpy as np
 import cv2
 
-i = np.array(Image.open("examples/" + (input("Path: "))).convert('L'))
+i = np.array(Image.open("examples/" + (input("Path: "))).convert('L')) / 255.0
 k = []
 k.append([0, 1, 0])
 k.append([1, 1, 1])
 k.append([0, 1, 0])
-t = k
-b = k
+k = np.array(k, dtype=np.uint8)
+_temp0 = cv2.morphologyEx((i * 255).astype(np.uint8), cv2.MORPH_TOPHAT, k).astype(np.float32) / 255.0
+t = _temp0
+_temp1 = cv2.morphologyEx((i * 255).astype(np.uint8), cv2.MORPH_BLACKHAT, k).astype(np.float32) / 255.0
+b = _temp1
 r = i + t - b
 if isinstance(r, list):
     _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in r]

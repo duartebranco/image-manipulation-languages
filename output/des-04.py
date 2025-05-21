@@ -3,9 +3,9 @@ from PIL import Image
 import numpy as np
 import cv2
 
-i = np.array(Image.open("examples/" + (input("Path: "))).convert('L'))
-k = input("Path: ")
-d = k
+i = np.array(Image.open("examples/" + (input("Path: "))).convert('L')) / 255.0
+k = run_iiml_program(input("Path: "))
+d = cv2.dilate(i, k, iterations=1)
 e = cv2.erode(i, k, iterations=1)
 r = d - e
 p = r
