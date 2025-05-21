@@ -5,8 +5,12 @@ import cv2
 
 i = np.array(Image.open("examples/" + (input("Path: "))).convert('L')) / 255.0
 k = run_iiml_program(input("Path: "))
-d = cv2.dilate(i, k, iterations=1)
-e = cv2.erode(i, k, iterations=1)
+k = np.array(k, dtype=np.uint8)
+_temp0 = cv2.dilate(i, k, iterations=1)
+d = _temp0
+k = np.array(k, dtype=np.uint8)
+_temp1 = cv2.erode(i, k, iterations=1)
+e = _temp1
 r = d - e
 p = r
 print(null)
@@ -17,6 +21,6 @@ if isinstance(r, list):
     else:
         print(f"Warning: Image list 'r' is empty. Cannot save GIF to {'examples/images/edges.pgm'}")
 elif isinstance(r, np.ndarray):
-    Image.fromarray(np.clip(r, 0, 255).astype(np.uint8)).save("examples/images/edges.pgm")
+    Image.fromarray(np.clip((r) * 255, 0, 255).astype(np.uint8)).save("examples/images/edges.pgm")
 else:
     print(f"Error: Cannot store type {type(r)} as image/GIF for expression 'r'.")

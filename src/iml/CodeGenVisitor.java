@@ -23,7 +23,7 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
          convertedKernels.add(kernelVar);
          return kernelVar + " = np.array(" + kernelVar + ", dtype=np.uint8)\n";
       }
-      return null;
+      return kernelVar + " = np.array(" + kernelVar + ", dtype=np.uint8)\n";
    }
 
    @Override public String visitProgram(imlParser.ProgramContext ctx) {
@@ -263,17 +263,18 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String image = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
       String kernelConv = ensureKernelIsNumpy(kernel);
-      if (kernelConv != null) {
-         return kernelConv + "\0" + "cv2.erode(" + image + ", " + kernel + ", iterations=1)";
-      }
-      return "cv2.erode(" + image + ", " + kernel + ", iterations=1)";
+      String tempVar = getTempVar();
+      sb.append(kernelConv);
+      sb.append(tempVar).append(" = cv2.erode(").append(image).append(", ").append(kernel).append(", iterations=1)\n");
+      return tempVar;
    }
 
    @Override public String visitOpenExpr(imlParser.OpenExprContext ctx) {
       String input = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
-      ensureKernelIsNumpy(kernel);
+      String kernelConv = ensureKernelIsNumpy(kernel);
       String tempVar = getTempVar();
+      sb.append(kernelConv);
       sb.append(tempVar).append(" = cv2.morphologyEx(").append(input)
          .append(", cv2.MORPH_OPEN, ").append(kernel).append(")\n");
       return tempVar;
@@ -282,8 +283,9 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    @Override public String visitCloseExpr(imlParser.CloseExprContext ctx) {
       String input = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
-      ensureKernelIsNumpy(kernel);
+      String kernelConv = ensureKernelIsNumpy(kernel);
       String tempVar = getTempVar();
+      sb.append(kernelConv);
       sb.append(tempVar).append(" = cv2.morphologyEx(").append(input)
          .append(", cv2.MORPH_CLOSE, ").append(kernel).append(")\n");
       return tempVar;
@@ -292,8 +294,9 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    @Override public String visitTopHatExpr(imlParser.TopHatExprContext ctx) {
       String img = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
-      ensureKernelIsNumpy(kernel);
+      String kernelConv = ensureKernelIsNumpy(kernel);
       String resultVar = getTempVar();
+      sb.append(kernelConv);
       sb.append(resultVar + " = cv2.morphologyEx((" + img + " * 255).astype(np.uint8), cv2.MORPH_TOPHAT, " + kernel + ").astype(np.float32) / 255.0\n");
       return resultVar;
    }
@@ -307,8 +310,9 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    @Override public String visitBlackHatExpr(imlParser.BlackHatExprContext ctx) {
       String img = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
-      ensureKernelIsNumpy(kernel);
+      String kernelConv = ensureKernelIsNumpy(kernel);
       String resultVar = getTempVar();
+      sb.append(kernelConv);
       sb.append(resultVar + " = cv2.morphologyEx((" + img + " * 255).astype(np.uint8), cv2.MORPH_BLACKHAT, " + kernel + ").astype(np.float32) / 255.0\n");
       return resultVar;
    }
@@ -317,10 +321,10 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String image = visit(ctx.expression(0));
       String kernel = visit(ctx.expression(1));
       String kernelConv = ensureKernelIsNumpy(kernel);
-      if (kernelConv != null) {
-         return kernelConv + "\0" + "cv2.dilate(" + image + ", " + kernel + ", iterations=1)";
-      }
-      return "cv2.dilate(" + image + ", " + kernel + ", iterations=1)";
+      String tempVar = getTempVar();
+      sb.append(kernelConv);
+      sb.append(tempVar).append(" = cv2.dilate(").append(image).append(", ").append(kernel).append(", iterations=1)\n");
+      return tempVar;
    }
 
    @Override public String visitPrimary(imlParser.PrimaryContext ctx) {

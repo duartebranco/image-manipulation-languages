@@ -5,7 +5,9 @@ import cv2
 
 i = np.array(Image.open("examples/" + ("images/sample03.pgm")).convert('L')) / 255.0
 k = run_iiml_program(input("Path: "))
+k = np.array(k, dtype=np.uint8)
 _temp0 = cv2.morphologyEx(i, cv2.MORPH_OPEN, k)
+k = np.array(k, dtype=np.uint8)
 _temp1 = cv2.morphologyEx((_temp0), cv2.MORPH_CLOSE, k)
 r = _temp1
 if isinstance(r, list):

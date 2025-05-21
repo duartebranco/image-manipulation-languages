@@ -11,6 +11,7 @@ k.append([0, 1, 0])
 k = np.array(k, dtype=np.uint8)
 _temp0 = cv2.morphologyEx((i * 255).astype(np.uint8), cv2.MORPH_TOPHAT, k).astype(np.float32) / 255.0
 t = _temp0
+k = np.array(k, dtype=np.uint8)
 _temp1 = cv2.morphologyEx((i * 255).astype(np.uint8), cv2.MORPH_BLACKHAT, k).astype(np.float32) / 255.0
 b = _temp1
 r = i + t - b
@@ -21,6 +22,6 @@ if isinstance(r, list):
     else:
         print(f"Warning: Image list 'r' is empty. Cannot save GIF to {'examples/images/enhanced.pgm'}")
 elif isinstance(r, np.ndarray):
-    Image.fromarray(np.clip(r, 0, 255).astype(np.uint8)).save("examples/images/enhanced.pgm")
+    Image.fromarray(np.clip((r) * 255, 0, 255).astype(np.uint8)).save("examples/images/enhanced.pgm")
 else:
     print(f"Error: Cannot store type {type(r)} as image/GIF for expression 'r'.")
