@@ -75,7 +75,7 @@ expression
     | '(' expression ')'                                            #parenExpr
 
     // flip op (vertical, horizontal, both, respectivaly)
-    | left=expression operator=('-'|'/'|'+') right=expression       #flipExpr 
+    | left=expression operator=('-'|'|'|'+') right=expression       #flipExpr 
     // scale op (vertical, horizontal, both, respectivaly)       
     | left=expression operator=('|*'|'-*'|'+*') right=expression    #scaleExpr
     // pixel by pixel operations

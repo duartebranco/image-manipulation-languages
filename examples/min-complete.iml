@@ -1,0 +1,123 @@
+// Load input image
+image i is load from "images/sample00.pgm"
+image k is load from "images/sample01.pgm"
+
+// Apply morphological operations
+image i2 is (i open by k) close by k
+
+// Image pixel-wise arithmetic
+image add is i .+ k
+
+// Apply fliping
+image flippedV is i - 180
+// draw flippedV
+image flippedH is i | 180
+// draw flippedH
+image flipped is i + 180
+// draw flipped
+
+// Apply scaling
+image scaledV is i |* 50%
+//draw scaledV
+image scaledH is i -* 50%
+//draw scaledH
+image scaled is i +* 50%
+//draw scaled
+
+
+// Get dimensions
+// number cols is columns of blend
+// number rows is rows of blend
+
+// Type conversion and string concatenation
+// string s is "Cols: " + string(cols)
+// output s
+// number n is number("10")
+
+// Conditional check
+// if any pixel blend .> 0 then
+//     output "Image is not empty"
+// else
+//     output "Image is blank"
+// done
+
+// Loop using 'until'
+// number counter is 0
+// until counter == 3 do
+//     output counter
+//     counter is counter + 1
+// done
+
+// Loop using 'for'
+// for number x within [1, 2, 3] do
+//     output x
+// done
+
+// Save result
+// blend store into "images/blended_result.pgm"
+// draw blend
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Load input image
+// image i is load from "images/sample00.pgm"
+// 
+// // Read a kernel using the interpreted language
+// image k is run from read "Kernel path: "
+// 
+// // Apply morphological operations
+// image i2 is (i open by k) close by k
+// 
+// // Image pixel-wise arithmetic
+// image blend is i .* 30% .+ 70% .* i2
+// 
+// // Apply flip and scale
+// image flipped is -i
+// image scaled is i -* 50%
+// 
+// // Get dimensions
+// number cols is columns of blend
+// number rows is rows of blend
+// 
+// // Type conversion and string concatenation
+// string s is "Cols: " + string(cols)
+// output s
+// number n is number("10")
+// 
+// // Conditional check
+// if any pixel blend .> 0 then
+//     output "Image is not empty"
+// else
+//     output "Image is blank"
+// done
+// 
+// // Loop using 'until'
+// number counter is 0
+// until counter == 3 do
+//     output counter
+//     counter is counter + 1
+// done
+// 
+// // Loop using 'for'
+// for number x within [1, 2, 3] do
+//     output x
+// done
+// 
+// // Save result
+// blend store into "images/blended_result.pgm"
+// draw blend
+
+

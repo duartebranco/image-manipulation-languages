@@ -390,4 +390,26 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
          return "np.array(Image.fromarray(" + left + ").resize((int(" + left + ".shape[1] * " + right + "), int(" + left + ".shape[0] * " + right + "))))";
       }
    }
+
+   @Override
+   public String visitFlipExpr(imlParser.FlipExprContext ctx) {
+      String image = visit(ctx.left);
+      String op = ctx.operator.getText();
+      String tempVar = getTempVar();
+      // Flip: '-' = vertical, '|' = horizontal, '+' = both
+      switch (op) {
+         case "-": // vertical flip
+            sb.append(tempVar).append(" = np.flipud(").append(image).append(")\n");
+            break;
+         case "|": // horizontal flip
+            sb.append(tempVar).append(" = np.fliplr(").append(image).append(")\n");
+            break;
+         case "+": // both
+            sb.append(tempVar).append(" = np.flipud(np.fliplr(").append(image).append("))\n");
+            break;
+         default:
+            sb.append("# Unknown flip operator: ").append(op).append("\n");
+      }
+      return tempVar;
+   }
 }
