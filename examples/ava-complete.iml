@@ -1,12 +1,96 @@
 // funções e variáveis locais
+number x is 10
+
 function soma(number a, number b) is
-    number res is a + b
-    return res
+    number x is a + b      // x local (shadowing do global)
+    output "x local na função soma: " + string(x)
+    return x
 end
 
-number x is soma(3, 4)
-output string(x)
+function usaGlobal() is
+    output "x global dentro da função usaGlobal: " + string(x)
+    number y is x + 1
+    output "y local: " + string(y)
+    return y
+end
 
+output "x global antes: " + string(x)
+number res is soma(3, 4)
+output "resultado de soma(3, 4): " + string(res)
+output "x global depois: " + string(x)
+
+number y is usaGlobal()
+output "y global: " + string(y)
+
+// Teste de contexto: variável local só existe dentro da função
+function testLocalScope() is
+    number z is 99
+    output "z local: " + string(z)
+    return z
+end
+
+number z is 5
+output "z global antes: " + string(z)
+number zFunc is testLocalScope()
+output "z global depois: " + string(z)
+output "z retornado pela função: " + string(zFunc)
+
+
+// Imagens RGB
+// Carregar imagem RGB
+image rgb is load from "images/color_sample.ppm"
+draw rgb
+
+// Guardar imagem RGB
+rgb store into "images/rgb_copy.ppm"
+
+// Operações pixel-wise RGB
+image rgb_neg is .- rgb
+draw rgb_neg
+
+image rgb_bright is rgb .+ 0.2
+draw rgb_bright
+
+image rgb_dark is rgb .- 0.2
+draw rgb_dark
+
+// Flip horizontal e vertical RGB
+image rgb_flipH is | rgb
+draw rgb_flipH
+image rgb_flipV is - rgb
+draw rgb_flipV
+
+// Escalar imagem RGB (50%)
+image rgb_scaled is rgb +* 0.5
+draw rgb_scaled
+
+// Aceder a canais individuais (R, G, B)
+image r_channel is rgb[0]
+image g_channel is rgb[1]
+image b_channel is rgb[2]
+draw r_channel
+draw g_channel
+draw b_channel
+
+// Operações morfológicas RGB (aplicadas a cada canal)
+image kernel is load from "images/kernel00.pgm"
+image rgb_eroded is rgb erode by kernel
+draw rgb_eroded
+image rgb_dilated is rgb dilate by kernel
+draw rgb_dilated
+image rgb_opened is rgb open by kernel
+draw rgb_opened
+image rgb_closed is rgb close by kernel
+draw rgb_closed
+
+// Top hat e black hat RGB
+image rgb_tophat is rgb top hat by kernel
+draw rgb_tophat
+image rgb_blackhat is rgb black hat by kernel
+draw rgb_blackhat
+
+// Guardar resultado final
+rgb_neg store into "images/rgb_neg.ppm"
 
 
 // Tratamento de erros

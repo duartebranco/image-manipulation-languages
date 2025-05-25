@@ -82,22 +82,15 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitIfStatement(imlParser.IfStatementContext ctx) {
-     String cond = visit(ctx.expression());
+      String cond = visit(ctx.expression());
       sb.append("if ").append(cond).append(":\n");
-
-      // Process statements in the 'then' block
-      for (imlParser.StatementContext st : ctx.thenStmts) { // Use the 'thenStmts' label
-         sb.append("    "); // Add indentation
-         visit(st);
+      for (imlParser.StatementContext st : ctx.thenStmts) {
+         visitIndented(st, "    ");
       }
-
-      // Check if there is an 'else' block
-      if (ctx.elseStmts != null && !ctx.elseStmts.isEmpty()) { // Use the 'elseStmts' label
+      if (ctx.elseStmts != null && !ctx.elseStmts.isEmpty()) {
          sb.append("else:\n");
-         // Process statements in the 'else' block
          for (imlParser.StatementContext st : ctx.elseStmts) {
-            sb.append("    "); // Add indentation
-            visit(st);
+               visitIndented(st, "    ");
          }
       }
       return null;
@@ -105,14 +98,13 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
    @Override 
    public String visitForStatement(imlParser.ForStatementContext ctx) {
-      String type = ctx.type().getText().trim(); // e.g., "percentage"
-      String var = ctx.ID().getText();           // e.g., "p"
-      String iterable = visit(ctx.expression()); // e.g., "l"
+      String type = ctx.type().getText().trim();
+      String var = ctx.ID().getText();
+      String iterable = visit(ctx.expression());
 
       sb.append("for ").append(var).append(" in ").append(iterable).append(":\n");
       for (imlParser.StatementContext st : ctx.statement()) {
-         sb.append("    ");
-         visit(st);
+         visitIndented(st, "    ");
       }
       return null;
    }
@@ -154,9 +146,11 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
    @Override public String visitDrawStatement(imlParser.DrawStatementContext ctx) {
       String expr = visit(ctx.expression());
-      sb.append("Image.fromarray(np.clip((")
-      .append(expr)
-      .append(") * 255, 0, 255).astype(np.uint8)).show()\n");
+      sb.append("img_draw = ").append(expr).append("\n");
+      sb.append("if img_draw.ndim == 2:\n");
+      sb.append("    Image.fromarray(np.clip(img_draw * 255, 0, 255).astype(np.uint8)).show()\n");
+      sb.append("else:\n");
+      sb.append("    Image.fromarray(np.clip(img_draw * 255, 0, 255).astype(np.uint8), 'RGB').show()\n");
       return null;
    }
 
@@ -174,20 +168,22 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       // This will be wrapped in single quotes within the f-string.
       String pathContentForFString = "examples/" + relPath;
 
-      sb.append("if isinstance(").append(exprToStore).append(", list):\n");
-      sb.append("    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in ").append(exprToStore).append("]\n");
+      sb.append("img_store = ").append(exprToStore).append("\n");
+      sb.append("if isinstance(img_store, list):\n");
+      sb.append("    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in img_store]\n");
       sb.append("    if _pil_images_for_gif:\n");
       sb.append("        _pil_images_for_gif[0].save(").append(pythonStringLiteralForSave)
-        .append(", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)\n");
+      .append(", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)\n");
       sb.append("    else:\n");
-      // Corrected f-string: use single quotes for the path literal inside the f-string expression
       sb.append("        print(f\"Warning: Image list '").append(exprToStore.replace("\"", "\\\""))
-        .append("' is empty. Cannot save GIF to {'").append(pathContentForFString).append("'}\")\n");
-      sb.append("elif isinstance(").append(exprToStore).append(", np.ndarray):\n");
-      sb.append("    Image.fromarray(np.clip((").append(exprToStore)
-        .append(") * 255, 0, 255).astype(np.uint8)).save(").append(pythonStringLiteralForSave).append(")\n");
+      .append("' is empty. Cannot save GIF to {'").append(pathContentForFString).append("'}\")\n");
+      sb.append("elif isinstance(img_store, np.ndarray):\n");
+      sb.append("    if img_store.ndim == 2:\n");
+      sb.append("        Image.fromarray(np.clip(img_store * 255, 0, 255).astype(np.uint8)).save(").append(pythonStringLiteralForSave).append(")\n");
+      sb.append("    else:\n");
+      sb.append("        Image.fromarray(np.clip(img_store * 255, 0, 255).astype(np.uint8), 'RGB').save(").append(pythonStringLiteralForSave).append(")\n");
       sb.append("else:\n");
-      sb.append("    print(f\"Error: Cannot store type {type(").append(exprToStore).append(")} as image/GIF for expression '").append(exprToStore.replace("\"", "\\\"")).append("'.\")\n");
+      sb.append("    print(f\"Error: Cannot store type {type(img_store)} as image/GIF for expression '").append(exprToStore.replace("\"", "\\\"")).append("'.\")\n");      
       return null;
    }
 
@@ -203,7 +199,7 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
    @Override public String visitLoadExpr(imlParser.LoadExprContext ctx) {
       String pathExpr = visit(ctx.expression());
-      return "np.array(Image.open(\"examples/\" + (" + pathExpr + ")).convert('L')) / 255.0";
+      return "(lambda _p: np.array(Image.open('examples/' + _p).convert('L')) / 255.0 if _p.lower().endswith(('.pgm')) else np.array(Image.open('examples/' + _p).convert('RGB')) / 255.0)(" + pathExpr + ")";
    }
 
    @Override public String visitStringConversionExpr(imlParser.StringConversionExprContext ctx) {
@@ -274,7 +270,10 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String kernelConv = ensureKernelIsNumpy(kernel);
       String tempVar = getTempVar();
       sb.append(kernelConv);
-      sb.append(tempVar).append(" = cv2.erode(").append(image).append(", ").append(kernel).append(", iterations=1)\n");
+      sb.append("if ").append(image).append(".ndim == 3:\n");
+      sb.append("    ").append(tempVar).append(" = np.stack([cv2.erode(").append(image).append("[...,c], ").append(kernel).append(", iterations=1) for c in range(").append(image).append(".shape[2])], axis=-1)\n");
+      sb.append("else:\n");
+      sb.append("    ").append(tempVar).append(" = cv2.erode(").append(image).append(", ").append(kernel).append(", iterations=1)\n");
       return tempVar;
    }
 
@@ -404,7 +403,6 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String left = visit(ctx.left);
       String right = visit(ctx.right);
       String op = ctx.operator.getText();
-      // Use PIL.Image.resize for scaling
       String axis;
       switch (op) {
          case "|*": axis = "vertical"; break;
@@ -412,14 +410,25 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
          case "+*": axis = "both"; break;
          default: axis = "both";
       }
-      // For simplicity, assume right is a float or int
+      String width = "int(" + left + ".shape[1] * " + right + ")";
+      String height = "int(" + left + ".shape[0] * " + right + ")";
       if (axis.equals("vertical")) {
-         return "np.array(Image.fromarray(" + left + ").resize((" + left + ".shape[1], int(" + left + ".shape[0] * " + right + "))))";
+         height = "int(" + left + ".shape[0] * " + right + ")";
+         width = left + ".shape[1]";
       } else if (axis.equals("horizontal")) {
-         return "np.array(Image.fromarray(" + left + ").resize((int(" + left + ".shape[1] * " + right + "), " + left + ".shape[0])))";
-      } else {
-         return "np.array(Image.fromarray(" + left + ").resize((int(" + left + ".shape[1] * " + right + "), int(" + left + ".shape[0] * " + right + "))))";
+         width = "int(" + left + ".shape[1] * " + right + ")";
+         height = left + ".shape[0]";
       }
+      String tempVar = getTempVar();
+      sb.append("if ").append(left).append(".ndim == 2:\n");
+      sb.append("    ").append(tempVar).append(" = np.array(Image.fromarray(np.clip((")
+      .append(left).append(") * 255, 0, 255).astype(np.uint8)).resize((")
+      .append(width).append(", ").append(height).append("))) / 255.0\n");
+      sb.append("else:\n");
+      sb.append("    ").append(tempVar).append(" = np.array(Image.fromarray(np.clip((")
+      .append(left).append(") * 255, 0, 255).astype(np.uint8), mode='RGB').resize((")
+      .append(width).append(", ").append(height).append("))) / 255.0\n");
+      return tempVar;
    }
 
    @Override
