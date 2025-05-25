@@ -78,24 +78,91 @@ public class ValidationListener extends imlBaseListener {
     }
 
     public void enterForStatement(imlParser.ForStatementContext ctx) {
+        String type = ctx.type().getText();
+        String variable = ctx.ID().getText();
 
+        if (declaredVariables.containsKey(variable)) {
+            System.err.println("Error: Variable '" + variable + "' already declared in outer scope.");
+            error = true;
+            return;
+        }
+
+        TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
+        String iterableType = typeVisitor.visit(ctx.expression());
+
+        if (!iterableType.equals("list of " + type)) {
+            System.err.printf("Type error: 'for' loop expects list of %s but got %s%n", type, iterableType);
+            error = true;
+        } else {
+            declaredVariables.put(variable, type);
+        }
     }
 
     public void enterUntilStatement(imlParser.UntilStatementContext ctx) {
+        TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
+        String inferredType = typeVisitor.visit(ctx.expression());
 
+        if (!inferredType.equals("boolean")) {
+            System.err.println("Type error: 'until' condition must be boolean");
+            error = true;
+        }
     }
 
     public void enterOutputStatement(imlParser.OutputStatementContext ctx) {
+        TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
+        String exprType = typeVisitor.visit(ctx.expression());
 
+        if (!(exprType.equals("string") || exprType.equals("number") || exprType.equals("boolean"))) {
+            System.err.printf("Type error: cannot output type '%s'%n", exprType);
+            error = true;
+        }
     }
 
     public void enterDrawStatement(imlParser.DrawStatementContext ctx) {
+        TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
+        String exprType = typeVisitor.visit(ctx.expression());
 
+        if (!exprType.equals("image")) {
+            System.err.printf("Type error: cannot draw type '%s'%n", exprType);
+            error = true;
+        }
     }
 
     public void enterStoreStatement(imlParser.StoreStatementContext ctx) {
+        TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
+        String exprType = typeVisitor.visit(ctx.expression());
 
+        if (!exprType.equals("image")) {
+            System.err.printf("Type error: only images can be stored, got %s%n", exprType);
+            error = true;
+        }
     }
 
+    public void enterAppendStatement(imlParser.AppendStatementContext ctx) {
+        String listVar = ctx.ID().getText();
+    
+        if (!declaredVariables.containsKey(listVar)) {
+            System.err.println("Error: Variable '" + listVar + "' not declared.");
+            error = true;
+            return;
+        }
+
+        TypeInferenceVisitor typeVisitor = new TypeInferenceVisitor(declaredVariables);
+        String listType = declaredVariables.get(listVar);
+        String exprType = typeVisitor.visit(ctx.expression());
+
+        if (!listType.startsWith("list of ")) {
+            System.err.printf("Type error: '%s' is not a list%n", listVar);
+            error = true;
+            return;
+        }
+
+        String elementType = listType.substring("list of ".length());
+        if (!elementType.equals(exprType)) {
+            System.err.printf("Type error: cannot append %s to %s%n", exprType, listType);
+            error = true;
+            return;
+        }
+    }
 
 }
