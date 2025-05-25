@@ -1,0 +1,79 @@
+// Load input images
+image i is load from "images/sample00.pgm"
+image k is load from "images/sample01.pgm"
+
+
+// Relações de ordem e operadores booleanos
+image gt is i .> k
+draw gt
+image lt is i .< k
+draw lt
+image eq is i .== k
+draw eq
+image neq is i .!= k
+draw neq
+image and_img is (i .> 0.5) .& (k .> 0.5)
+draw and_img
+image or_img is (i .> 0.5) .| (k .> 0.5)
+draw or_img
+image not_img is .! (i .> 0.5)
+draw not_img
+
+
+// any pixel, all pixel
+if any pixel i .> 0.5 then
+    output "Há pelo menos um pixel acima de 0.5"
+done
+
+if all pixel i .> 0.5 then
+    output "Todos os pixeis acima de 0.5"
+else
+    output "Nem todos os pixeis acima de 0.5"
+done
+
+
+// count pixel in
+number n_white is count pixel 1 in i
+output "Pixeis brancos: " + string(n_white)
+number n_black is count pixel 0 in i
+output "Pixeis pretos: " + string(n_black)
+
+
+// // Normal conditional statements 
+if n_white > n_black then
+    output "Mais brancos que pretos"
+else
+    output "Mais pretos que brancos"
+done
+
+ 
+// Lists and basic operations
+list of number numbers is [1, 2, 3, 4]
+numbers append 5
+output "Lista: " + string(numbers)
+
+
+// Indexação e listas de listas
+list of list of number l2d is [[1,2], [3,4]]
+output "Elemento (1,2): " + string(l2d[1][1])
+
+
+// Save as gif animation
+image img1 is load from "images/sample00.pgm"
+image img2 is load from "images/sample01.pgm"
+list of image imgs is [img1, img2]
+imgs store into "images/anim.gif"
+
+
+// Iterating over lists
+for number x within numbers do
+    output "Elemento: " + string(x)
+done
+
+
+// top_hat and black_hat operations
+image nk is load from "images/kernel00.pgm"
+image top_hat is i top hat by nk
+draw top_hat
+image black_hat is i black hat by nk
+draw black_hat

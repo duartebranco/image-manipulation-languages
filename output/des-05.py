@@ -16,7 +16,7 @@ _temp1 = cv2.morphologyEx((i * 255).astype(np.uint8), cv2.MORPH_BLACKHAT, k).ast
 b = _temp1
 r = i + t - b
 if isinstance(r, list):
-    _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in r]
+    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in r]
     if _pil_images_for_gif:
         _pil_images_for_gif[0].save("examples/images/enhanced.pgm", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)
     else:

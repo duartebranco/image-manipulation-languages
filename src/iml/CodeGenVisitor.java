@@ -170,7 +170,7 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String pathContentForFString = "examples/" + relPath;
 
       sb.append("if isinstance(").append(exprToStore).append(", list):\n");
-      sb.append("    _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in ").append(exprToStore).append("]\n");
+      sb.append("    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in ").append(exprToStore).append("]\n");
       sb.append("    if _pil_images_for_gif:\n");
       sb.append("        _pil_images_for_gif[0].save(").append(pythonStringLiteralForSave)
         .append(", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)\n");
@@ -226,10 +226,12 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       return left + " " + op + " " + right;
    }   
 
-   @Override public String visitCountPixelExpr(imlParser.CountPixelExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+   @Override
+   public String visitCountPixelExpr(imlParser.CountPixelExprContext ctx) {
+      String value = visit(ctx.expression(0));
+      String image = visit(ctx.expression(1));
+      // Conta o número de pixeis iguais a value na imagem
+      return "np.sum(" + image + " == " + value + ")";
    }
 
    @Override public String visitAnyPixelExpr(imlParser.AnyPixelExprContext ctx) {
@@ -329,20 +331,25 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       return tempVar;
    }
 
-   @Override public String visitPrimary(imlParser.PrimaryContext ctx) {
-      if (ctx.ID()        != null) return ctx.ID().getText();
-      if (ctx.NUMBER()    != null) return ctx.NUMBER().getText();
-      if (ctx.PERCENTAGE()!= null) {
-         String t = ctx.PERCENTAGE().getText(); 
+   @Override
+   public String visitPrimary(imlParser.PrimaryContext ctx) {
+      if (ctx.ID() != null) return ctx.ID().getText();
+      if (ctx.NUMBER() != null) return ctx.NUMBER().getText();
+      if (ctx.PERCENTAGE() != null) {
+         String t = ctx.PERCENTAGE().getText();
          return "(" + t.substring(0, t.length()-1) + "/100)";
       }
-      if (ctx.STRING()    != null) return ctx.STRING().getText();
-      if (ctx.BOOLEAN()   != null) {
+      if (ctx.STRING() != null) return ctx.STRING().getText();
+      if (ctx.BOOLEAN() != null) {
          String val = ctx.BOOLEAN().getText();
          if (val.equals("true")) return "True";
          if (val.equals("false")) return "False";
       }
-      if (ctx.list()      != null) return visit(ctx.list());
+      if (ctx.list() != null) return visit(ctx.list());
+      if (ctx.primary() != null && ctx.expression() != null) {
+         // indexação: l2d[1][1]
+         return visit(ctx.primary()) + "[" + visit(ctx.expression()) + "]";
+      }
       return null;
    }
 
@@ -367,11 +374,22 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String left = visit(ctx.left);
       String right = visit(ctx.right);
       String op = ctx.operator.getText();
+
+      // Heurística: se ambos os lados são comparações, então é booleano
+      boolean leftIsBool = left.contains(">") || left.contains("<") || left.contains("==") || left.contains("!=");
+      boolean rightIsBool = right.contains(">") || right.contains("<") || right.contains("==") || right.contains("!=");
+
+      if (op.equals(".|")) {
+         if (leftIsBool && rightIsBool) {
+               return "(" + left + ") | (" + right + ")";
+         } else {
+               return left + " / " + right;
+         }
+      }
       switch (op) {
          case ".*": return left + " * " + right;
          case ".+": return left + " + " + right;
          case ".-": return left + " - " + right;
-         case ".|": return left + " / " + right;
          default: return left + " " + op + " " + right;
       }
    }
@@ -440,5 +458,40 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
          return left + " + " + right;
       }
       return left + " " + op + " " + right;
+   }
+
+   @Override
+   public String visitPixelBoolOperationExpr(imlParser.PixelBoolOperationExprContext ctx) {
+      String left = visit(ctx.left);
+      String right = visit(ctx.right);
+      String op = ctx.operator.getText();
+      switch (op) {
+         case ".>": return left + " > " + right;
+         case ".<": return left + " < " + right;
+         case ".==": return left + " == " + right;
+         case ".!=": return left + " != " + right;
+         case ".&": return left + " & " + right;
+         case ".|": return left + " | " + right;
+         case ".!": return "~" + left;
+         default: throw new RuntimeException("Unknown pixel-wise boolean op: " + op);
+      }
+   }
+
+   @Override
+   public String visitUnaryPixelBoolOperationExpr(imlParser.UnaryPixelBoolOperationExprContext ctx) {
+      String operand = visit(ctx.expression());
+      return "~" + operand;
+   }
+
+   @Override
+   public String visitAllPixelExpr(imlParser.AllPixelExprContext ctx) {
+      String image = visit(ctx.expression());
+      String op = ctx.operator.getText();
+      String number = ctx.NUMBER().getText();
+
+      // Converter operador se necessário
+      if (op.equals(".>")) op = ">";
+
+      return "np.all(" + image + " " + op + " " + number + ")";
    }
 }

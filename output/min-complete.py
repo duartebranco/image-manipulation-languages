@@ -87,7 +87,7 @@ kernel = run_iiml_program("examples/min-01.iiml")
 Image.fromarray(np.clip((kernel) * 255, 0, 255).astype(np.uint8)).show()
 result = (i * (50/100)) + (k * (50/100))
 if isinstance(result, list):
-    _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in result]
+    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in result]
     if _pil_images_for_gif:
         _pil_images_for_gif[0].save("examples/images/blended_result.pgm", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)
     else:

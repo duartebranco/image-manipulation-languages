@@ -16,7 +16,7 @@ else:
     print("Image does not contains any object.")
 Image.fromarray(np.clip((r) * 255, 0, 255).astype(np.uint8)).show()
 if isinstance(r, list):
-    _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in r]
+    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in r]
     if _pil_images_for_gif:
         _pil_images_for_gif[0].save("examples/images/result.pgm", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)
     else:

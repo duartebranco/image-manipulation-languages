@@ -69,6 +69,7 @@ expression
     | 'read' STRING                                                 #readExpr
     | 'count' 'pixel' expression 'in' expression                    #countPixelExpr
     | 'any' 'pixel' expression operator=('>'|'.>') NUMBER           #anyPixelExpr
+    | 'all' 'pixel' expression operator=('>'|'.>') NUMBER           #allPixelExpr
     | 'columns' 'of' expression                                     #columnsExpr
     | 'rows' 'of' expression                                        #rowsExpr
     | 'string' '(' expression ')'                                   #stringConversionExpr
@@ -83,8 +84,10 @@ expression
     | left=expression operator=('.*'|'.+'|'.-'|'.|') right=expression    #pixelOperationExpr
     // unary pixel operations
     | operator='.-' expression                                      #unaryPixelOperationExpr
-    | left=expression operator=('!='|'==') right=expression         #comparisonExpr
+    | left=expression operator=('!='|'=='|'>'|'<'|'>='|'<=' ) right=expression   #comparisonExpr
     | left=expression operator=('+'|'-'|'*'|'/') right=expression   #arithmeticExpr
+    | left=expression operator=('.>'|'.<'|'.=='|'.!='|'.&'|'.|') right=expression   #pixelBoolOperationExpr
+    | operator='.!' expression                                      #unaryPixelBoolOperationExpr
     ;
 
 primary
@@ -94,6 +97,7 @@ primary
     | STRING
     | BOOLEAN
     | list
+    | primary '[' expression ']'
     ;
 
 list

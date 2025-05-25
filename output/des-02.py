@@ -13,7 +13,7 @@ while (np.any(i > 0)):
     i = _temp0
     l.append(i)
 if isinstance(l, list):
-    _pil_images_for_gif = [Image.fromarray(np.clip(_frame, 0, 255).astype(np.uint8)) for _frame in l]
+    _pil_images_for_gif = [Image.fromarray(np.clip(_frame * 255, 0, 255).astype(np.uint8)) for _frame in l]
     if _pil_images_for_gif:
         _pil_images_for_gif[0].save("examples/animation.gif", save_all=True, append_images=_pil_images_for_gif[1:], duration=100, loop=0)
     else:
