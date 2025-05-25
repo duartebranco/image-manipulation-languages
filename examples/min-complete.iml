@@ -1,123 +1,145 @@
 // Load input image
 image i is load from "images/sample00.pgm"
 image k is load from "images/sample01.pgm"
+image nk is load from "images/kernel00.pgm"
 
-// Apply morphological operations
-image i2 is (i open by k) close by k
+// // Apply morphological operations
+// image i2 is (i open by nk) close by nk
+// draw i2
+// image opened is i open by nk
+// draw opened
+// image closed is i close by nk
+// draw closed
+// image eroded is i erode by nk
+// draw eroded
+// image dilated is i dilate by nk
+// draw dilated
 
-// Image pixel-wise arithmetic
-image add is i .+ k
+// // Image pixel-wise arithmetic
+// image sum is i .+ k
+// draw sum
+// image diff is i .- k
+// draw diff
+// image prod is i .* k
+// draw prod
+// image div is i .| k
+// draw div
 
-// Apply fliping
-image flippedV is i - 180
+// // Apply unary pixel-wise operations
+// image neg is .- i
+// draw neg
+
+// // Apply fliping
+// image flippedV is - i
 // draw flippedV
-image flippedH is i | 180
+// image flippedH is | i
 // draw flippedH
-image flipped is i + 180
+// image flipped is + i
 // draw flipped
 
-// Apply scaling
-image scaledV is i |* 50%
-//draw scaledV
-image scaledH is i -* 50%
-//draw scaledH
-image scaled is i +* 50%
-//draw scaled
+// // Apply scaling
+// image scaledV is i |* 50%
+// draw scaledV
+// image scaledH is i -* 50%
+// draw scaledH
+// image scaled is i +* 50%
+// draw scaled
+
+// // Data types
+// number n is 42
+// percentage p is 30%
+// string s is "Hello"
+// boolean b is true <-- erro
+
+// // Arithmetic operations
+// number soma is n + 8
+// percentage p2 is p + 20%
+// number mult is n * 2
+// percentage p3 is p * 2
+
+// // Type conversion
+// string s2 is string(n)
+// output s2
+// number n2 is number("10")
+// output n2
+
+// // String concatenation
+// string s3 is "Cols: " + string(columns of i) + ", Rows: " + string(rows of i)
+// output s3
+
+
+// // --- IO: output e leitura ---
+// output "Introduza um número:"
+// number userNum is number(read "Número: ")
+// output userNum
+// 
+// // --- Dimensões da imagem ---
+// number cols is columns of i
+// number rows is rows of i
+// output "Dimensões: " + string(cols) + "x" + string(rows)
+// 
+// // --- Condicional ---
+// if any pixel i .> 0 then
+//     output "Image is not empty"
+// else
+//     output "Image is blank"
+// done
+// 
+// // --- Ciclo until ---
+// number counter is 0
+// until counter == 3 do
+//     output counter
+//     counter is counter + 1
+// done
+// 
+// // --- Ciclo for sobre lista ---
+// for number x within [1, 2, 3] do
+//     output x
+// done
+// 
+// // --- Execução da linguagem secundária ---
+// image kernel is run from "examples/min-01.iiml"
+// draw kernel
+// 
+// // --- Armazenamento de imagem ---
+// image result is (i .* 50%) .+ (k .* 50%)
+// result store into "images/blended_result.pgm"
+// draw result
+
+
 
 
 // Get dimensions
-// number cols is columns of blend
-// number rows is rows of blend
-
-// Type conversion and string concatenation
-// string s is "Cols: " + string(cols)
-// output s
-// number n is number("10")
-
-// Conditional check
-// if any pixel blend .> 0 then
-//     output "Image is not empty"
-// else
-//     output "Image is blank"
-// done
-
-// Loop using 'until'
-// number counter is 0
-// until counter == 3 do
-//     output counter
-//     counter is counter + 1
-// done
-
-// Loop using 'for'
-// for number x within [1, 2, 3] do
-//     output x
-// done
-
-// Save result
-// blend store into "images/blended_result.pgm"
-// draw blend
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Load input image
-// image i is load from "images/sample00.pgm"
-// 
-// // Read a kernel using the interpreted language
-// image k is run from read "Kernel path: "
-// 
-// // Apply morphological operations
-// image i2 is (i open by k) close by k
-// 
-// // Image pixel-wise arithmetic
-// image blend is i .* 30% .+ 70% .* i2
-// 
-// // Apply flip and scale
-// image flipped is -i
-// image scaled is i -* 50%
-// 
-// // Get dimensions
-// number cols is columns of blend
-// number rows is rows of blend
-// 
-// // Type conversion and string concatenation
-// string s is "Cols: " + string(cols)
-// output s
-// number n is number("10")
-// 
-// // Conditional check
-// if any pixel blend .> 0 then
-//     output "Image is not empty"
-// else
-//     output "Image is blank"
-// done
-// 
-// // Loop using 'until'
-// number counter is 0
-// until counter == 3 do
-//     output counter
-//     counter is counter + 1
-// done
-// 
-// // Loop using 'for'
-// for number x within [1, 2, 3] do
-//     output x
-// done
-// 
-// // Save result
-// blend store into "images/blended_result.pgm"
-// draw blend
-
-
+// number cols is columns of i
+// number rows is rows of i
+//// Type conversion and string concatenation
+//string s is "Cols: " + string(cols) + ", Rows: " + string(rows)
+//output s
+//number n is number("10")
+//
+//// Conditional check
+//if any pixel i .> 0 then
+//    output "Image is not empty"
+//else
+//    output "Image is blank"
+//done
+//
+//// Loop using 'until'
+//number counter is 0
+//until counter == 3 do
+//    output counter
+//    counter is counter + 1
+//done
+//
+//// Loop using 'for'
+//for number x within [1, 2, 3] do
+//    output x
+//done
+//
+//// Execute secondary language
+//image kernel is run from "examples/min-01.iiml"
+//
+//// Save result
+//image result is (i .* 50%) .+ (k .* 50%)
+//result store into "images/blended_result.pgm"
+//draw result

@@ -206,9 +206,15 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
    }
 
    @Override public String visitStringConversionExpr(imlParser.StringConversionExprContext ctx) {
-      String res = null;
-      return visitChildren(ctx);
-      //return res;
+      String expr = visit(ctx.expression());
+      return "str(" + expr + ")";
+   }
+
+   @Override
+   public String visitNumberConversionExpr(imlParser.NumberConversionExprContext ctx) {
+      String expr = visit(ctx.expression());
+      // Usa float() para aceitar números e strings numéricas
+      return "float(" + expr + ")";
    }
 
    @Override public String visitReadExpr(imlParser.ReadExprContext ctx) {
@@ -335,6 +341,11 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
          return "(" + t.substring(0, t.length()-1) + "/100)";
       }
       if (ctx.STRING()    != null) return ctx.STRING().getText();
+      if (ctx.BOOLEAN()   != null) {
+         String val = ctx.BOOLEAN().getText();
+         if (val.equals("true")) return "True";
+         if (val.equals("false")) return "False";
+      }
       if (ctx.list()      != null) return visit(ctx.list());
       return null;
    }
@@ -364,6 +375,7 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
          case ".*": return left + " * " + right;
          case ".+": return left + " + " + right;
          case ".-": return left + " - " + right;
+         case ".|": return left + " / " + right;
          default: return left + " " + op + " " + right;
       }
    }
@@ -393,23 +405,44 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
 
    @Override
    public String visitFlipExpr(imlParser.FlipExprContext ctx) {
-      String image = visit(ctx.left);
+      String image = visit(ctx.expression());
       String op = ctx.operator.getText();
       String tempVar = getTempVar();
-      // Flip: '-' = vertical, '|' = horizontal, '+' = both
       switch (op) {
          case "-": // vertical flip
-            sb.append(tempVar).append(" = np.flipud(").append(image).append(")\n");
-            break;
+               sb.append(tempVar).append(" = np.flipud(").append(image).append(")\n");
+               break;
          case "|": // horizontal flip
-            sb.append(tempVar).append(" = np.fliplr(").append(image).append(")\n");
-            break;
+               sb.append(tempVar).append(" = np.fliplr(").append(image).append(")\n");
+               break;
          case "+": // both
-            sb.append(tempVar).append(" = np.flipud(np.fliplr(").append(image).append("))\n");
-            break;
+               sb.append(tempVar).append(" = np.flipud(np.fliplr(").append(image).append("))\n");
+               break;
          default:
-            sb.append("# Unknown flip operator: ").append(op).append("\n");
+               throw new IllegalArgumentException("Unknown flip operator: " + op);
       }
       return tempVar;
+   }
+
+   @Override
+   public String visitUnaryPixelOperationExpr(imlParser.UnaryPixelOperationExprContext ctx) {
+      String operand = visit(ctx.expression());
+      String op = ctx.operator.getText();
+      if (op.equals(".-")) {
+         return "1.0 - " + operand; // Inverso da imagem
+      }
+      return operand; // Caso não identificado
+   }
+
+   @Override
+   public String visitArithmeticExpr(imlParser.ArithmeticExprContext ctx) {
+      String left = visit(ctx.left);
+      String right = visit(ctx.right);
+      String op = ctx.operator.getText();
+      if (op.equals("+")) {
+         // Se algum dos lados é string, faz concatenação
+         return left + " + " + right;
+      }
+      return left + " " + op + " " + right;
    }
 }

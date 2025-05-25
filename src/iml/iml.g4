@@ -18,7 +18,7 @@ statement
     ;
 
 variableDeclaration
-    : type ID 'is' expression
+    : type ID ('is' expression)?
     ;
 
 assignment
@@ -72,15 +72,19 @@ expression
     | 'columns' 'of' expression                                     #columnsExpr
     | 'rows' 'of' expression                                        #rowsExpr
     | 'string' '(' expression ')'                                   #stringConversionExpr
+    | 'number' '(' expression ')'                                   #numberConversionExpr
     | '(' expression ')'                                            #parenExpr
 
-    // flip op (vertical, horizontal, both, respectivaly)
-    | left=expression operator=('-'|'|'|'+') right=expression       #flipExpr 
+    // unary flip op (vertical, horizontal, both, respectivaly)
+    | operator=('-'|'|'|'+') expression                             #flipExpr
     // scale op (vertical, horizontal, both, respectivaly)       
     | left=expression operator=('|*'|'-*'|'+*') right=expression    #scaleExpr
     // pixel by pixel operations
-    | left=expression operator=('.*'|'.+'|'.-') right=expression    #pixelOperationExpr
+    | left=expression operator=('.*'|'.+'|'.-'|'.|') right=expression    #pixelOperationExpr
+    // unary pixel operations
+    | operator='.-' expression                                      #unaryPixelOperationExpr
     | left=expression operator=('!='|'==') right=expression         #comparisonExpr
+    | left=expression operator=('+'|'-'|'*'|'/') right=expression   #arithmeticExpr
     ;
 
 primary
@@ -97,12 +101,12 @@ list
     ;
 
 type
-    : 'image '
-    | 'number '
-    | 'string '
-    | 'percentage '
-    | 'boolean '
-    | 'list ' 'of ' type
+    : 'image'
+    | 'number'
+    | 'string'
+    | 'percentage'
+    | 'boolean'
+    | 'list' 'of' type
     ;
 
 PERCENTAGE
