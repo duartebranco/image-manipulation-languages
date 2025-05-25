@@ -45,16 +45,14 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       //return res;
    }
 
-   @Override public String visitVariableDeclaration(imlParser.VariableDeclarationContext ctx) {
-      // emit:   <name> = <expr>
+   @Override 
+   public String visitVariableDeclaration(imlParser.VariableDeclarationContext ctx) {
       String varName = ctx.ID().getText();
-      String exprResult = visit(ctx.expression());
-      // If exprResult is a temp variable (starts with _temp), assign it to varName
-      if (exprResult.startsWith("_temp")) {
-         sb.append(varName).append(" = ").append(exprResult).append("\n");
-      } else {
+      if (ctx.expression() != null) {
+         String exprResult = visit(ctx.expression());
          sb.append(varName).append(" = ").append(exprResult).append("\n");
       }
+      // Se não houver expressão, só declara o nome (opcional em Python, normalmente ignora)
       return null;
    }
 
@@ -75,7 +73,6 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
             .append(rhs)
             .append("\n");
       }
-      System.err.println("DEBUG: [assignment] " + ctx.ID().getText() + " = " + rhs);
       return null;
    }
 
@@ -196,7 +193,6 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       String itemToAppend = visit(ctx.expression());
       sb.append(listName).append(".append(").append(itemToAppend).append(")\n");
       int after = sb.length();
-      System.err.println("DEBUG: [append] " + sb.substring(before, after));
       return null;
    }
 

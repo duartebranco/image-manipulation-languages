@@ -121,13 +121,13 @@ STRING
     : '"' ~["\r\n]* '"'
     ;
 
-ID
-    : [a-zA-Z][a-zA-Z0-9_]*
-    ;
-
 BOOLEAN
     : 'true'
     | 'false'
+    ;
+    
+ID
+    : [a-zA-Z][a-zA-Z0-9_]*
     ;
 
 COMMENT
