@@ -12,7 +12,7 @@
 
 ### Testes
 
-for f in ../../examples/{min-0{1..3},des-0{1..5}}.iml; do java imlMain "$f"; done
+for f in ../../examples/*.iml; do java imlMain "$f"; done
 
 - [x] `min-01.iml`
 - [x] `min-02.iml`

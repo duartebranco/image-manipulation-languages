@@ -1,0 +1,19 @@
+// funções e variáveis locais
+function soma(number a, number b) is
+    number res is a + b
+    return res
+end
+
+number x is soma(3, 4)
+output string(x)
+
+
+
+// Tratamento de erros
+image i
+try
+    i is load from "images/nao_existe.ppm"
+catch
+    output "File not found."
+    exit
+end

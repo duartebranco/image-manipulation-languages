@@ -26,13 +26,18 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       return kernelVar + " = np.array(" + kernelVar + ", dtype=np.uint8)\n";
    }
 
-   @Override public String visitProgram(imlParser.ProgramContext ctx) {
+   @Override 
+   public String visitProgram(imlParser.ProgramContext ctx) {
       // emit Python header
       sb.append("#!/usr/bin/env python3\n")
          .append("from PIL import Image\n")
          .append("import numpy as np\n")
          .append("import cv2\n\n");
-      // visit each statement
+      // Primeiro, visita todas as funções
+      for (imlParser.FunctionDeclContext f : ctx.functionDecl()) {
+         visit(f);
+      }
+      // Depois, visita todos os statements
       for (imlParser.StatementContext st : ctx.statement()) {
          visit(st);
       }
@@ -493,5 +498,59 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       if (op.equals(".>")) op = ">";
 
       return "np.all(" + image + " " + op + " " + number + ")";
+   }
+
+   @Override
+   public String visitFunctionDecl(imlParser.FunctionDeclContext ctx) {
+      String funcName = ctx.ID().getText();
+      StringBuilder params = new StringBuilder();
+      if (ctx.paramList() != null) {
+         for (int i = 0; i < ctx.paramList().param().size(); i++) {
+               if (i > 0) params.append(", ");
+               params.append(ctx.paramList().param(i).ID().getText());
+         }
+      }
+      sb.append("def ").append(funcName).append("(").append(params).append("):\n");
+      // Corpo da função
+      for (imlParser.StatementContext st : ctx.statement()) {
+         sb.append("    ");
+         visit(st);
+      }
+      if (ctx.expression() != null) {
+         sb.append("    return ").append(visit(ctx.expression())).append("\n");
+      }
+      sb.append("\n");
+      return null;
+   }
+
+   @Override
+   public String visitFunctionCallExpr(imlParser.FunctionCallExprContext ctx) {
+      String funcName = ctx.ID().getText();
+      String args = "";
+      if (ctx.expression() != null && !ctx.expression().isEmpty()) {
+         args = ctx.expression().stream().map(this::visit).collect(Collectors.joining(", "));
+      }
+      return funcName + "(" + args + ")";
+   }
+
+   @Override
+   public String visitTryCatchStatement(imlParser.TryCatchStatementContext ctx) {
+      sb.append("try:\n");
+      for (imlParser.StatementContext st : ctx.tryBlock) {
+         sb.append("    ");
+         visit(st);
+      }
+      sb.append("except Exception as e:\n");
+      for (imlParser.StatementContext st : ctx.catchBlock) {
+         sb.append("    ");
+         visit(st);
+      }
+      return null;
+   }
+
+   @Override
+   public String visitExitStatement(imlParser.ExitStatementContext ctx) {
+      sb.append("exit()\n");
+      return null;
    }
 }

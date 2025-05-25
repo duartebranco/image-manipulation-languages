@@ -1,7 +1,19 @@
 grammar iml;
 
 program
-    : statement* EOF
+    : (functionDecl | statement)* EOF
+    ;
+
+functionDecl
+    : 'function' ID '(' paramList? ')' ( 'returns' type )? 'is' statement* ('return' expression)? 'end'
+    ;
+
+paramList
+    : param (',' param)*
+    ;
+
+param
+    : type ID
     ;
 
 statement
@@ -14,7 +26,13 @@ statement
     | drawStatement
     | storeStatement
     | appendStatement
+    | tryCatchStatement
+    | exitStatement
     | COMMENT
+    ;
+
+exitStatement
+    : 'exit'
     ;
 
 variableDeclaration
@@ -53,8 +71,13 @@ appendStatement
     : ID 'append' expression
     ;
 
+tryCatchStatement
+    : 'try' tryBlock+=statement+ 'catch' catchBlock+=statement+ 'end'
+    ;
+
 expression
     : primary                                                       #primaryExpr
+    | ID '(' (expression (',' expression)*)? ')'                    #functionCallExpr
     | expression 'open' 'by' expression                             #openExpr
     | expression 'close' 'by' expression                            #closeExpr
     | expression 'dilate' 'by' expression                           #dilateExpr
