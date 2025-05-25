@@ -28,8 +28,8 @@ public class imlMain {
          }
 
          ParseTreeWalker walker = new ParseTreeWalker();
-         //ValidationListener listener = new ValidationListener();
-         //walker.walk(listener, tree);
+         ValidationListener listener = new ValidationListener();
+         walker.walk(listener, tree);
 
          //if (!listener.hasError()) {
             CodeGenVisitor visitor0 = new CodeGenVisitor();
