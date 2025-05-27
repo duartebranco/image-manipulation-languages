@@ -133,7 +133,7 @@ type
     | 'string'
     | 'percentage'
     | 'boolean'
-    | 'list' 'of' type
+    | 'list ' 'of ' type
     ;
 
 PERCENTAGE
