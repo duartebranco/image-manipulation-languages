@@ -2,6 +2,11 @@
 from PIL import Image
 import numpy as np
 import cv2
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/iiml')))
+from src.iiml.run_iiml import run_iiml_program
 
 def soma(a, b):
     x = a + b

@@ -2,6 +2,11 @@
 from PIL import Image
 import numpy as np
 import cv2
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/iiml')))
+from src.iiml.run_iiml import run_iiml_program
 
 i = (lambda _p: np.array(Image.open('examples/' + _p).convert('L')) / 255.0 if _p.lower().endswith(('.pgm')) else np.array(Image.open('examples/' + _p).convert('RGB')) / 255.0)(input("Path: "))
 l = [(100/100), (90/100), (80/100), (70/100), (60/100), (50/100), (40/100), (30/100), (20/100), (10/100)]

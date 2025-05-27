@@ -32,7 +32,12 @@ public class CodeGenVisitor extends imlBaseVisitor<String> {
       sb.append("#!/usr/bin/env python3\n")
          .append("from PIL import Image\n")
          .append("import numpy as np\n")
-         .append("import cv2\n\n");
+         .append("import cv2\n")
+         .append("import sys\n")
+         .append("import os\n")
+         .append("sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))\n")
+         .append("sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/iiml')))\n")
+         .append("from src.iiml.run_iiml import run_iiml_program\n\n");
       // Primeiro, visita todas as funções
       for (imlParser.FunctionDeclContext f : ctx.functionDecl()) {
          visit(f);
