@@ -1,18 +1,25 @@
 # C PROJ - IML
 
-## TEST iml
+## Build
 
    ```bash
-    cd src/iml
-    antlr4-build
-    java imlMain ../../examples/***
-    cd ../..
-    python3 output/***
+   cd src/iiml
+   antlr4-build -python
+   cd ../iml
+   antlr4-build
+   for f in ../../examples/*.iml; do java imlMain "$f"; done
    ```
 
-### Testes
+## Clean
 
-for f in ../../examples/*.iml; do java imlMain "$f"; done
+   ```bash
+   cd src/iiml
+   antlr4-clean -python
+   cd ../iml
+   antlr4-clean
+   ```
+
+### Tests
 
 - [x] `min-01.iml`
 - [x] `min-02.iml`
