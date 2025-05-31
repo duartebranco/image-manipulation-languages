@@ -10,6 +10,7 @@ statement
     | imageStatement
     | placeStatement
     | outputStatement
+    | forStatement
     | COMMENT
     ;
 
@@ -30,7 +31,20 @@ imageStatement
     ;
 
 placeStatement
-    : 'place' shape 'radius' expression 'at' expression expression 'with' 'intensity' expression
+    : 'place' shape (shapeSize) 'at' expression expression 'with' 'intensity' expression
+    ;
+
+shapeSize
+    : 'radius' expression
+    | 'width' expression 'height' expression
+    ;
+
+forStatement
+    : 'for' forControl statement
+    ;
+
+forControl
+    : (type)? ID 'within' expression
     ;
 
 shape
@@ -48,8 +62,8 @@ expression
     | '(' expression ')'                                   #parenExpr
     | left=expression operator=('*'|'/') right=expression  #arithmeticMulDivExpr
     | left=expression operator=('+'|'-') right=expression  #arithmeticAddSubExpr
+    | expression '[' expression ']'                        #indexExpr
     ;
-
 
 primary
     : ID

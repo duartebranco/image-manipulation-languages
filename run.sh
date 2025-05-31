@@ -77,8 +77,28 @@ run_iiml_example() {
 }
 
 run_iiml_custom() {
-    echo -e "${YELLOW}Enter the path to your IIML file:${NC}"
-    read iiml_file
+    echo -e "${YELLOW}Select an IIML file to run:${NC}"
+    echo -e "1. min-01.iiml"
+    echo -e "2. min-iiml-01.iiml"
+    echo -e "3. min-iiml-02.iiml"
+    echo -e "4. des-iiml-01.iiml"
+    echo -e "0. Enter custom file path"
+    read -r choice
+    
+    case $choice in
+        1) iiml_file="examples/min-01.iiml" ;;
+        2) iiml_file="examples/min-iiml-01.iiml" ;;
+        3) iiml_file="examples/min-iiml-02.iiml" ;;
+        4) iiml_file="examples/des-iiml-01.iiml" ;;
+        0)
+            echo -e "${YELLOW}Enter the path to your IIML file:${NC}"
+            read -r iiml_file
+            ;;
+        *)
+            echo -e "${RED}Invalid option. Returning to main menu.${NC}"
+            return
+            ;;
+    esac
     
     if [ -f "$iiml_file" ]; then
         echo -e "${YELLOW}Running IIML interpreter with $iiml_file...${NC}"

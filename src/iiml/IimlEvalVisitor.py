@@ -19,6 +19,9 @@ class IimlEvalVisitor(iimlVisitor):
       value = self.visit(ctx.expression())
       self.vars[var_name] = value
       return value
+   
+   def visitParenExpr(self, ctx:iimlParser.ParenExprContext):
+    return self.visit(ctx.expression())
 
    def visitAssignment(self, ctx:iimlParser.AssignmentContext):
       var_name = ctx.ID().getText()
@@ -90,58 +93,134 @@ class IimlEvalVisitor(iimlVisitor):
    def visitList(self, ctx:iimlParser.ListContext):
       return [self.visit(expr) for expr in ctx.expression()]
    
+   # Add these methods to your existing IimlEvalVisitor class
+   
    def visitPlaceStatement(self, ctx:iimlParser.PlaceStatementContext):
-    if "image" not in self.vars:
-        raise RuntimeError("No active image to draw on")
-    
-    shape = ctx.shape().getText()
-    radius = int(self.visit(ctx.expression(0)))
-    centerX = int(self.visit(ctx.expression(1)))
-    centerY = int(self.visit(ctx.expression(2)))
-    intensity = float(self.visit(ctx.expression(3)))
-    
-    img = self.vars["image"]
-    height, width = img.shape  # Note: numpy arrays are (height, width)
-    
-    # Create meshgrid for efficient vectorized operations
-    y, x = np.ogrid[:height, :width]
-    
-    if shape == "circle":
-        # Circle equation: (x-center_x)^2 + (y-center_y)^2 <= r^2
-        mask = (x - centerX)**2 + (y - centerY)**2 <= radius**2
-        img[mask] = intensity
-    
-    elif shape == "rect":
-        # Rectangle with sides 2*radius
-        x_min, x_max = max(0, centerX - radius), min(width, centerX + radius)
-        y_min, y_max = max(0, centerY - radius), min(height, centerY + radius)
-        img[y_min:y_max, x_min:x_max] = intensity
-    
-    elif shape == "cross":
-        thickness = max(1, radius//5)
-        
-        # Draw the cross diagonals
-        for y_pos in range(max(0, centerY - radius), min(height, centerY + radius)):
-            for x_pos in range(max(0, centerX - radius), min(width, centerX + radius)):
-                # Check if point is on either diagonal with thickness
-                dx, dy = x_pos - centerX, y_pos - centerY
-                if abs(dx - dy) <= thickness or abs(dx + dy) <= thickness:
-                    img[y_pos, x_pos] = intensity
-    
-    elif shape == "plus":
-        thickness = max(1, radius//5)
-        
-        # Horizontal line
-        x_min, x_max = max(0, centerX - radius), min(width, centerX + radius)
-        y_min, y_max = max(0, centerY - thickness), min(height, centerY + thickness)
-        img[y_min:y_max, x_min:x_max] = intensity
-        
-        # Vertical line
-        x_min, x_max = max(0, centerX - thickness), min(width, centerX + thickness)
-        y_min, y_max = max(0, centerY - radius), min(height, centerY + radius)
-        img[y_min:y_max, x_min:x_max] = intensity
-    
-    else:
-        raise RuntimeError(f"Unknown shape: {shape}")
-    
-    return img
+      if "image" not in self.vars:
+         raise RuntimeError("No active image to draw on")
+      
+      shape = ctx.shape().getText()
+      img = self.vars["image"]
+      height, width = img.shape  # Note: numpy arrays are (height, width)
+      
+      # Initialize variables with default values to avoid "possibly unbound" error
+      shape_width = 0
+      shape_height = 0
+      radius = 0
+      size_type = "radius"  # Default size type
+      
+      # Get shape size (either radius or width/height)
+      if ctx.shapeSize().getChild(0).getText() == "radius":
+         # Using radius
+         radius = int(self.visit(ctx.shapeSize().expression(0)))
+         size_type = "radius"
+      else:
+         # Using width/height
+         shape_width = int(self.visit(ctx.shapeSize().expression(0)))
+         shape_height = int(self.visit(ctx.shapeSize().expression(1)))
+         # Convert width/height to equivalent radius for simplicity
+         radius = max(shape_width, shape_height) // 2
+         size_type = "width_height"
+      
+      # Get center position
+      centerX = int(self.visit(ctx.expression(0)))
+      centerY = int(self.visit(ctx.expression(1)))
+      
+      # Get intensity
+      intensity = float(self.visit(ctx.expression(2)))
+      
+      # Draw shape based on shape type
+      if shape == "circle":
+         # Circle equation: (x-center_x)^2 + (y-center_y)^2 <= r^2
+         y, x = np.ogrid[:height, :width]
+         mask = (x - centerX)**2 + (y - centerY)**2 <= radius**2
+         img[mask] = intensity
+      
+      elif shape == "rect":
+         if size_type == "radius":
+               # Rectangle with sides 2*radius
+               x_min, x_max = max(0, centerX - radius), min(width, centerX + radius)
+               y_min, y_max = max(0, centerY - radius), min(height, centerY + radius)
+         else:
+               # Rectangle with specific width/height
+               x_min = max(0, centerX - shape_width // 2)
+               x_max = min(width, centerX + (shape_width - shape_width // 2))
+               y_min = max(0, centerY - shape_height // 2)
+               y_max = min(height, centerY + (shape_height - shape_height // 2))
+         
+         img[y_min:y_max, x_min:x_max] = intensity
+      
+      elif shape == "cross":
+         thickness = max(1, radius//5)
+         
+         # Draw the cross diagonals
+         for y_pos in range(max(0, centerY - radius), min(height, centerY + radius)):
+               for x_pos in range(max(0, centerX - radius), min(width, centerX + radius)):
+                  # Check if point is on either diagonal with thickness
+                  dx, dy = x_pos - centerX, y_pos - centerY
+                  if abs(dx - dy) <= thickness or abs(dx + dy) <= thickness:
+                     img[y_pos, x_pos] = intensity
+      
+      elif shape == "plus":
+         thickness = max(1, radius//5)
+         
+         # Horizontal line
+         x_min, x_max = max(0, centerX - radius), min(width, centerX + radius)
+         y_min, y_max = max(0, centerY - thickness), min(height, centerY + thickness)
+         img[y_min:y_max, x_min:x_max] = intensity
+         
+         # Vertical line
+         x_min, x_max = max(0, centerX - thickness), min(width, centerX + thickness)
+         y_min, y_max = max(0, centerY - radius), min(height, centerY + radius)
+         img[y_min:y_max, x_min:x_max] = intensity
+      
+      else:
+         raise RuntimeError(f"Unknown shape: {shape}")
+      
+      return img
+
+   def visitForStatement(self, ctx:iimlParser.ForStatementContext):
+      # Get the iterable collection
+      collection = self.visit(ctx.forControl().expression())
+      
+      # Get the iteration variable name
+      var_name = ctx.forControl().ID().getText()
+      
+      # Determine the variable type if specified
+      var_type = None
+      if ctx.forControl().type_():
+         var_type = ctx.forControl().type_().getText()
+      
+      # Store the original value of the variable if it exists
+      original_value = self.vars.get(var_name, None)
+      
+      # Iterate over the collection
+      for item in collection:
+         # Assign the current item to the iteration variable
+         self.vars[var_name] = item
+         
+         # Execute the loop body (a single statement)
+         self.visit(ctx.statement())
+      
+      # Restore the original value or remove if it didn't exist before
+      if original_value is not None:
+         self.vars[var_name] = original_value
+      else:
+         self.vars.pop(var_name, None)
+      
+      return None
+
+   def visitIndexExpr(self, ctx:iimlParser.IndexExprContext):
+      # Get the list or array
+      container = self.visit(ctx.expression(0))
+      # Get the index
+      index = int(self.visit(ctx.expression(1)))
+      
+      # Handle lists, numpy arrays, or other indexable objects
+      if isinstance(container, (list, np.ndarray)):
+         if 0 <= index < len(container):
+               return container[index]
+         else:
+               raise RuntimeError(f"Index {index} out of bounds for container of length {len(container)}")
+      else:
+         raise RuntimeError(f"Cannot index into object of type {type(container)}")
