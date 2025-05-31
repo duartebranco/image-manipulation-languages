@@ -44,7 +44,16 @@ forStatement
     ;
 
 forControl
-    : (type)? ID 'within' expression
+    : (forType)? ID 'within' expression
+    ;
+
+forType
+    : 'image'
+    | 'number'
+    | 'string'
+    | 'percentage'
+    | 'list'
+    | 'list' 'of' type
     ;
 
 shape

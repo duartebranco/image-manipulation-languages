@@ -188,8 +188,8 @@ class IimlEvalVisitor(iimlVisitor):
       
       # Determine the variable type if specified
       var_type = None
-      if ctx.forControl().type_():
-         var_type = ctx.forControl().type_().getText()
+      if ctx.forControl().forType():
+         var_type = ctx.forControl().forType().getText()
       
       # Store the original value of the variable if it exists
       original_value = self.vars.get(var_name, None)

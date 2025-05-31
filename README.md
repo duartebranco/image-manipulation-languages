@@ -35,16 +35,16 @@ or run `tests.sh`
 - [x] `min-01.iml`
 - [x] `min-02.iml`
 - [x] `min-02-new.iml`
-- [ ] `min-03.iml` (preciso 2ª gramatica)
+- [x] `min-03.iml` (preciso 2ª gramatica)
 - [x] `min-03-new.iml`
-- [ ] `min-04.iml` (preciso 2ª gramatica)
+- [x] `min-04.iml` (preciso 2ª gramatica)
 - [x] `des-01.iml`
 - [x] `des-02.iml`
 - [x] `des-03.iml`
-- [ ] `des-04.iml` (preciso 2ª gramatica)
+- [x] `des-04.iml` (preciso 2ª gramatica)
 - [x] `des-05.iml`
 - [x] `des-06.iml`
-- [ ] `min-01.iiml`(2ª gramatica)
-- [ ] `min-iiml-01.iiml`(2ª gramatica)
-- [ ] `min-iiml-02.iiml`(2ª gramatica)
-- [ ] `des-iiml-01.iiml`(2ª gramatica)
+- [x] `min-01.iiml`(2ª gramatica)
+- [x] `min-iiml-01.iiml`(2ª gramatica)
+- [x] `min-iiml-02.iiml`(2ª gramatica)
+- [x] `des-iiml-01.iiml`(2ª gramatica)
