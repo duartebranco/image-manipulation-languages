@@ -93,8 +93,8 @@ expression
     | 'count' 'pixel' expression 'in' expression                    #countPixelExpr
     | 'any' 'pixel' expression operator=('>'|'.>') NUMBER           #anyPixelExpr
     | 'all' 'pixel' expression operator=('>'|'.>') NUMBER           #allPixelExpr
-    | 'columns' 'of' expression                                     #columnsExpr
-    | 'rows' 'of' expression                                        #rowsExpr
+    | 'columns' 'of ' expression                                     #columnsExpr
+    | 'rows' 'of ' expression                                        #rowsExpr
     | 'string' '(' expression ')'                                   #stringConversionExpr
     | 'number' '(' expression ')'                                   #numberConversionExpr
     | '(' expression ')'                                            #parenExpr
@@ -133,7 +133,7 @@ type
     | 'string'
     | 'percentage'
     | 'boolean'
-    | 'list' 'of' type
+    | 'list ' 'of ' type
     ;
 
 PERCENTAGE

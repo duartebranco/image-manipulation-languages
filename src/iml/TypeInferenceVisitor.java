@@ -36,7 +36,11 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
             if (function.equals("Global Scope")) {
                 return symbolTable.getOrDefault(id, "unknown");
             } else {
-                return functionVariables.get(function).getOrDefault(id, "unknown");
+                if (functionVariables.get(function).getOrDefault(id, "unknown").equals("unknown")) {
+                    return symbolTable.getOrDefault(id, "unknown");
+                } else {
+                    return functionVariables.get(function).getOrDefault(id, "unknown");
+                }
             }
         } else if (ctx.NUMBER() != null) {
             return "number";
@@ -44,6 +48,8 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
             return "percentage";
         } else if (ctx.STRING() != null) {
             return "string";
+        } else if (ctx.BOOLEAN() != null) {
+            return "boolean";
         } else if (ctx.list() != null) {
             return visit(ctx.list());
         } else if (ctx.primary() != null) {
@@ -168,7 +174,17 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
 
     @Override
     public String visitArithmeticExpr(imlParser.ArithmeticExprContext ctx) {
-        return "number";
+        String type1 = visit(ctx.left);
+        String type2 = visit(ctx.right);
+
+        if (type1.equals(type2)) {
+            return type1;
+        } else if ((type1.equals("number") && type2.equals("percentage")) || (type2.equals("number") && type1.equals("percentage"))) {
+            return "percentage";
+        } else {
+            return "unknown";
+        }
+        //return "number";
     }
 
     @Override

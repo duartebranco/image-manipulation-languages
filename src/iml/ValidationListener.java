@@ -297,6 +297,11 @@ public class ValidationListener extends imlBaseListener {
                 .map(p -> p.type().getText())
                 .collect(Collectors.toList());
 
+        List<String> parameterNames = ctx.paramList() == null ? new ArrayList<>()
+            : ctx.paramList().param().stream()
+                .map(p -> p.ID().getText())
+                .collect(Collectors.toList());
+
         if (declaredFunctions.containsKey(functionName)) {
             if (declaredFunctions.get(functionName).getParametersType().toString().equals(parameterTypes.toString())) {
                 System.err.printf("Function error: Function %s has already been declared\n", functionName);
@@ -306,6 +311,10 @@ public class ValidationListener extends imlBaseListener {
         }
 
         functionVariables.put(functionName, new HashMap<>());
+
+        for (int i = 0; i < parameterNames.size(); i++) {
+            functionVariables.get(functionName).put(parameterNames.get(i), parameterTypes.get(i));
+        }
 
         currentFunction = functionName;
         typeVisitor.changeScope(functionName);
