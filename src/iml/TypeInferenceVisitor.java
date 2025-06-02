@@ -211,4 +211,9 @@ public class TypeInferenceVisitor extends imlBaseVisitor<String> {
         return returnType;
     }
 
+    @Override
+    public String visitNumberConversionExpr(imlParser.NumberConversionExprContext ctx) {
+        return "number";
+    }
+
 }
