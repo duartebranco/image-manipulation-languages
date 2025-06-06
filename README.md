@@ -1,50 +1,9 @@
 # C PROJ - IML
 
-## Build
+## /output
 
-   ```bash
-   cd src/iiml
-   antlr4-build -python
-   cd ../iml
-   antlr4-build
-   ```
+This is the folder where the compilation python result files go to.
 
-or run `build.sh`
+## build, compile and run scripts
 
-## Clean
-
-   ```bash
-   cd src/iiml
-   antlr4-clean -python
-   cd ../iml
-   antlr4-clean
-   ```
-
-or run `clean.sh`
-
-### Tests
-
-To convert all iml tests:
-   ```bash
-   cd src/iml
-   for f in ../../examples/*.iml; do java imlMain "$f"; done
-   ```
-
-or run `tests.sh`
-
-- [x] `min-01.iml`
-- [x] `min-02.iml`
-- [x] `min-02-new.iml`
-- [x] `min-03.iml` (preciso 2ª gramatica)
-- [x] `min-03-new.iml`
-- [x] `min-04.iml` (preciso 2ª gramatica)
-- [x] `des-01.iml`
-- [x] `des-02.iml`
-- [x] `des-03.iml`
-- [x] `des-04.iml` (preciso 2ª gramatica)
-- [x] `des-05.iml`
-- [x] `des-06.iml`
-- [x] `min-01.iiml`(2ª gramatica)
-- [x] `min-iiml-01.iiml`(2ª gramatica)
-- [x] `min-iiml-02.iiml`(2ª gramatica)
-- [x] `des-iiml-01.iiml`(2ª gramatica)
+The scripts can be ran from anywhere. 

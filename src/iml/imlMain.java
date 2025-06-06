@@ -42,7 +42,7 @@ public class imlMain {
             Files.createDirectories(outDir);
             Path outFile = outDir.resolve(base + ".py");
             Files.writeString(outFile, py);
-            System.out.println("→ generated " + outFile);
+            System.out.println("→ generated output/" + base + ".py");
          //}
       }
       catch(IOException e) {
