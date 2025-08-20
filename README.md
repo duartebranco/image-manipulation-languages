@@ -141,3 +141,13 @@ All documentation for the project can be found in the `doc/` directory, includin
 ├── output/                         # Generated Python files
 └── doc/                            # Project documentation
 ```
+
+## About This Project
+
+*This project was developed as a final project for the Compilers course at the University of Aveiro.*
+
+### Authors
+
+- [Duarte Branco](https://github.com/duartebranco)
+- [Diogo Nascimento](https://github.com/DCANascimento)
+- [Henrique Reveles](https://github.com/HenriqueRadical)
