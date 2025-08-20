@@ -64,14 +64,14 @@ place circle radius 30 at 50 50 with intensity 1
 ```
 ├── src/
 │   ├── iml/                        # IML compiler (Java + ANTLR4)
-│   │   ├── iml.g4                 # IML grammar
-│   │   ├── imlMain.java           # Main compiler class
-│   │   ├── CodeGenVisitor.java    # Visitor for generating Python code
+│   │   ├── iml.g4                  # IML grammar
+│   │   ├── imlMain.java            # Main compiler class
+│   │   ├── CodeGenVisitor.java     # Visitor for generating Python code
 │   │   └── ...
 │   ├── iiml/                       # IIML interpreter (Python + ANTLR4)
-│   │   ├── iiml.g4                # IIML grammar
-│   │   ├── iimlMain.py            # Main interpreter
-│   │   ├── IimlEvalVisitor.py     # Expression evaluator
+│   │   ├── iiml.g4                 # IIML grammar
+│   │   ├── iimlMain.py             # Main interpreter
+│   │   ├── IimlEvalVisitor.py      # Expression evaluator
 │   │   └── ...
 │   ├── build.sh                    # Build both languages
 │   ├── compile.sh                  # Compile IML to Python
@@ -80,8 +80,8 @@ place circle radius 30 at 50 50 with intensity 1
 │   ├── *.iml                       # IML example files
 │   ├── *.iiml                      # IIML example files
 │   └── images/                     # Sample images and outputs
-├── output/                          # Generated Python files
-└── doc/                             # Project documentation
+├── output/                         # Generated Python files
+└── doc/                            # Project documentation
 ```
 
 ## Prerequisites
