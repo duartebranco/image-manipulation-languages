@@ -1,8 +1,7 @@
 #!/bin/bash
+source "$(dirname "$0")/.env"
+shopt -s expand_aliases
 set -e
-
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check if filepath argument is provided
 if [ $# -eq 0 ]; then

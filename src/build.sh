@@ -1,8 +1,7 @@
 #!/bin/bash
+source "$(dirname "$0")/.env"
+shopt -s expand_aliases
 set -e
-
-# Get the directory where this script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "Building IIML (Python)..."
 cd "$SCRIPT_DIR/iiml/"
