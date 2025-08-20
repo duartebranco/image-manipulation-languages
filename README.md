@@ -5,7 +5,11 @@ Two domain-specific programming languages for **image processing** and **mathema
 - **IML (Image Manipulation Language)** - A **compiled language** for advanced image processing
 - **IIML (Interpreted Image Manipulation Language)** - A simpler **interpreted language** for basic image creation
 
-This project uses **ANTLR4** to define the **grammar syntax** through `.g4` grammar files, and to automatically generate **lexers** and **parsers** for both Java and Python targets. For IML, ANTLR4 generates Java-based lexer/parser components that feed into a custom `CodeGenVisitor` (Visitor) class, which implements a [**transpiler**](https://en.wikipedia.org/wiki/Source-to-source_compiler) that converts IML source code into executable Python code. For IIML, ANTLR4 generates Python-based parsing components that work with a custom `IimlEvalVisitor` to create a direct **interpreter** that executes image creation commands in real-time.
+This project uses **ANTLR4** to define the **grammar syntax** through `.g4` grammar files, and to automatically generate **lexers** and **parsers** for both Java and Python targets.
+
+For IML, ANTLR4 generates Java-based lexer/parser components that feed into a custom `CodeGenVisitor` (Visitor) class, which implements a [**transpiler**](https://en.wikipedia.org/wiki/Source-to-source_compiler) that converts IML source code into executable Python code.
+
+For IIML, ANTLR4 generates Python-based parsing components that work with a custom `IimlEvalVisitor` to create a direct **interpreter** that executes image creation commands in real-time.
 
 ANTLR4 is already installed and configured in the project as a wrapper made by Professor Miguel Oliveira e Silva.
 
@@ -19,11 +23,11 @@ For this project, our Professor divided the language features into these three c
 
 **Minimal Features:**
 
-- Load and save grayscale images (`.pgm`) (`load`, `store into`)
+- Load and save grayscale images (`.pgm`) (`load`, `store`)
 - Support for multiple data types (`image`, `number`, `string`, `percentage`, `boolean`, `list`)
 - Pixel-wise arithmetic operations (`.+`, `.-`, `.*`, `.|`)
 - Morphological operations (`erode`, `dilate`, `open`, `close`)
-- Image fliping (vertical, horizontal, both) (`-`, `|`, `+`)
+- Image flipping (vertical, horizontal, both) (`-`, `|`, `+`)
 - Image scaling (vertical, horizontal, both) (`|*`, `-*`, `+*`)
 - Standard arithmetic expressions (`+`, `*`) and string concatenation
 - Input/output instructions
@@ -34,7 +38,7 @@ For this project, our Professor divided the language features into these three c
 
 **Desirable Features:**
 
-- Pixel Order Relation and Boolean Operators (`.>`, `.<`, `.==`, `.!=`, `.&`, `.|`, `.!`) (greater than, less than, equal to, not equal to, and, or, not)
+- Pixel Order Relation and Boolean Operators (`.>`, `.<`, `.==`, `.!=`, `.&`, `.|`, `.!`) (greater than, less than, equals, not equal to, and, or, not)
 - `any` pixel and `all` pixel operators
 - `count` pixel in operator
 - Lists with insertion/removal of elements and indexing
@@ -82,10 +86,10 @@ cd src
 ### 2. Run IML Programs
 
 ```bash
-# Compile IML to Python
+# Compile .iml files into .py (python) files
 ./compile.sh ../examples/min-01.iml
 
-# Execute the generated Python
+# Execute the converted python files
 ./run.sh ../output/min-01.py
 ```
 
