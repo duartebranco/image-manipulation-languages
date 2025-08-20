@@ -1,74 +1,128 @@
 # IML & IIML - Image Manipulation Languages
 
-Two domain-specific programming languages for **image processing** and **mathematical morphology operations**.
+Two domain-specific programming languages for **image processing** and **mathematical morphology operations**:
 
-**IML (Image Manipulation Language)** - A **compiled language** for advanced image processing
+- **IML (Image Manipulation Language)** - A **compiled language** for advanced image processing
+- **IIML (Interpreted Image Manipulation Language)** - A simpler **interpreted language** for basic image creation
 
-**iiml (Interpreted Image Manipulation Language)** - A simpler **interpreted language** for basic image creation
+This project uses **ANTLR4** to define the **grammar syntax** through `.g4` grammar files, and to automatically generate **lexers** and **parsers** for both Java and Python targets. For IML, ANTLR4 generates Java-based lexer/parser components that feed into a custom `CodeGenVisitor` (Visitor) class, which implements a [**transpiler**](https://en.wikipedia.org/wiki/Source-to-source_compiler) that converts IML source code into executable Python code. For IIML, ANTLR4 generates Python-based parsing components that work with a custom `IimlEvalVisitor` to create a direct **interpreter** that executes image creation commands in real-time.
+
+ANTLR4 is already installed and configured in the project as a wrapper made by Professor Miguel Oliveira e Silva.
 
 ## Languages
 
 ### IML - Compiled Language
+
 IML is a feature-rich language that compiles to `Python`, designed for complex image processing tasks including mathematical morphology, pixel operations, and image analysis.
 
-**Key Features:**
-- Mathematical morphology operations (open, close, dilate, erode, top/black hat)
-- Pixel-wise arithmetic and boolean operations (`.+`, `.-`, `.*`, `.>`, `.&`, etc.)
-- Image transformations (flip, scale, rotate)
-- Control flow (if/else, for/until loops, try/catch, functions)
-- Image analysis (pixel counting, conditional checks)
-- Support for multiple data types: `image`, `number`, `string`, `percentage`, `boolean`, `list`
-- File I/O for PGM, PPM, and other image formats
-- GIF animation creation
+For this project, our Professor divided the language features into these three categories:
 
-**Example:**
-```iml
-// Load images and apply morphological operations
-image i is load from "images/sample00.pgm"
-image k is load from "images/kernel00.pgm"
+**Minimal Features:**
 
-// Clean noise with opening then closing
-image clean is (i open by k) close by k
+- Load and save grayscale images (`.pgm`) (`load`, `store into`)
+- Support for multiple data types (`image`, `number`, `string`, `percentage`, `boolean`, `list`)
+- Pixel-wise arithmetic operations (`.+`, `.-`, `.*`, `.|`)
+- Morphological operations (`erode`, `dilate`, `open`, `close`)
+- Image fliping (vertical, horizontal, both) (`-`, `|`, `+`)
+- Image scaling (vertical, horizontal, both) (`|*`, `-*`, `+*`)
+- Standard arithmetic expressions (`+`, `*`) and string concatenation
+- Input/output instructions
+- Type conversion
+- Draw images (`draw`)
+- Execute secondary interpreted language (iiml) (`run`)
+- Conditional (`if`, `else`, `done`)
 
-// Check if image contains objects
-if any pixel clean .> 0 then
-    output "Image contains objects."
-else
-    output "No objects found."
-done
+**Desirable Features:**
 
-draw clean
-clean store into "images/result.pgm"
-```
+- Pixel Order Relation and Boolean Operators (`.>`, `.<`, `.==`, `.!=`, `.&`, `.|`, `.!`) (greater than, less than, equal to, not equal to, and, or, not)
+- `any` pixel and `all` pixel operators
+- `count` pixel in operator
+- Lists with insertion/removal of elements and indexing
+- GIF animation creation, using lists of images
+- For and Until loops (`for`, `until`)
+- Additional morphology: `top-hat`, `black-hat`
+
+**Advanced Features:**
+
+- Functions and local variables
+- Runtime error handling (e.g., file not found)
+- Support for RGB color images with full operations
 
 ### IIML - Interpreted Language
+
 IIML is a simpler language for creating images with basic geometric shapes, executed directly without compilation.
 
 **Key Features:**
+
 - Image canvas creation with custom size and background
-- Shape drawing (circle, rectangle, cross, plus)
+- Shape drawing (`circle`, `rect`, `cross`, `plus`)
 - Basic variable manipulation and user input
 - Simple control flow
 
-**Example:**
-```iiml
-// Create a 100x100 image with black background
-image size 100 by 100 background 0
+## Prerequisites
 
-// Draw a white circle in the center
-place circle radius 30 at 50 50 with intensity 1
+- **Java 11+** (for IML compiler)
+- **Python 3.8+** (for IIML interpreter and runtime)
+
+### Python Dependencies
+
+```bash
+pip install numpy opencv-python
 ```
+
+## Quick Start
+
+### 1. Build the Languages
+
+```bash
+cd src
+./build.sh
+```
+
+### 2. Run IML Programs
+
+```bash
+# Compile IML to Python
+./compile.sh ../examples/min-01.iml
+
+# Execute the generated Python
+./run.sh ../output/min-01.py
+```
+
+### 3. Run IIML Programs
+
+```bash
+cd iiml
+python3 iimlMain.py ../../examples/min-01.iiml
+```
+
+### 4. Clean Compiled Files
+
+```bash
+cd src
+./clean.sh
+```
+
+## Code Examples
+
+All code examples (`.iml` and `.iiml`) for the project can be found in the `examples/` directory.
+
+## Documentation
+
+All documentation for the project can be found in the `doc/` directory, including a `Assignment.pdf` and a `Report.pdf`, which are written in Portuguese.
 
 ## Project Structure
 
 ```
 ├── src/
-│   ├── iml/                        # IML compiler (Java + ANTLR4)
+│   ├── bin/                        # ANTLR wrapper scripts
+│   ├── lib/                        # ANTLR libraries
+│   ├── iml/                        # IML
 │   │   ├── iml.g4                  # IML grammar
 │   │   ├── imlMain.java            # Main compiler class
 │   │   ├── CodeGenVisitor.java     # Visitor for generating Python code
 │   │   └── ...
-│   ├── iiml/                       # IIML interpreter (Python + ANTLR4)
+│   ├── iiml/                       # IIML
 │   │   ├── iiml.g4                 # IIML grammar
 │   │   ├── iimlMain.py             # Main interpreter
 │   │   ├── IimlEvalVisitor.py      # Expression evaluator
@@ -82,140 +136,4 @@ place circle radius 30 at 50 50 with intensity 1
 │   └── images/                     # Sample images and outputs
 ├── output/                         # Generated Python files
 └── doc/                            # Project documentation
-```
-
-## Prerequisites
-
-- **Java 11+** (for IML compiler)
-- **Python 3.8+** (for IIML interpreter and runtime)
-
-### Python Dependencies
-```bash
-pip install numpy opencv-python
-```
-
-## Quick Start
-
-### 1. Build the Languages
-```bash
-cd src
-./build.sh
-```
-
-### 2. Run IML Programs
-```bash
-# Compile IML to Python
-./compile.sh ../examples/min-01.iml
-
-# Execute the generated Python
-./run.sh ../output/min-01.py
-```
-
-### 3. Run IIML Programs
-```bash
-cd iiml
-python3 iimlMain.py ../../examples/min-01.iiml
-```
-
-### 4. Clean Compiled Files
-```bash
-cd src
-./clean.sh
-```
-
-## Usage Examples
-
-### Mathematical Morphology (IML)
-```iml
-image i is load from "images/noisy.pgm"
-image kernel is load from "images/kernel.pgm"
-
-// Remove small noise with opening
-image opened is i open by kernel
-
-// Fill small holes with closing
-image cleaned is opened close by kernel
-
-draw cleaned
-cleaned store into "images/clean.pgm"
-```
-
-### Pixel Analysis (IML)
-```iml
-image img is load from "images/binary.pgm"
-
-// Count white and black pixels
-number whites is count pixel 1 in img
-number blacks is count pixel 0 in img
-
-output "White pixels: " + string(whites)
-output "Black pixels: " + string(blacks)
-
-// Check image properties
-if all pixel img .> 0.5 then
-    output "Image is mostly white"
-done
-```
-
-### Shape Creation (IIML)
-```iiml
-// Create 200x200 canvas
-image size 200 by 200 background 0
-
-// Draw shapes
-place circle radius 50 at 100 100 with intensity 0.8
-place rect width 40 height 60 at 150 50 with intensity 0.6
-```
-
-## Language Reference
-
-### IML Data Types
-- `image` - 2D grayscale/color image arrays
-- `number` - Floating-point numbers
-- `string` - Text strings
-- `percentage` - Values with % suffix (e.g., `50%`)
-- `boolean` - `true`/`false` values
-- `list of T` - Dynamic arrays of type T
-
-### IML Operators
-- **Arithmetic**: `+`, `-`, `*`, `/`
-- **Pixel-wise**: `.*`, `.+`, `.-`, `.|`
-- **Comparison**: `>`, `<`, `>=`, `<=`, `==`, `!=`
-- **Pixel comparison**: `.>`, `.<`, `.==`, `.!=`
-- **Boolean**: `.&` (and), `.|` (or), `.!` (not)
-- **Morphology**: `open by`, `close by`, `dilate by`, `erode by`
-- **Advanced**: `top hat by`, `black hat by`
-
-### File Formats Supported
-- **PGM** - Grayscale images
-- **PPM** - Color images
-- **GIF** - Animations (for image lists)
-
-## Advanced Features
-
-### Functions (IML)
-```iml
-function enhance(image img, number factor) returns image is
-    image result is img .* factor
-    return result
-end
-
-image enhanced is enhance(load from "images/dark.pgm", 2.0)
-```
-
-### Animation (IML)
-```iml
-image frame1 is load from "images/f1.pgm"
-image frame2 is load from "images/f2.pgm"
-list of image animation is [frame1, frame2]
-animation store into "images/movie.gif"
-```
-
-### Error Handling (IML)
-```iml
-try
-    image img is load from "images/missing.pgm"
-catch
-    output "Failed to load image"
-end
 ```
